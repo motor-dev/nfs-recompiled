@@ -24,8 +24,11 @@ void CPU::cpuid()
         eax = 0x0510;
         ebx = 0x0000;
         ecx = 0x0000;
-        edx = 0x008001BF; // with MMX
-        //edx = 0x000001BF; // without MMX
+        #ifdef WITH_MMX
+            edx = 0x008001BF; // Pentium MMX
+        #else
+            edx = 0x000001BF; // Pentium
+        #endif
         break;
     default:
         NFS2_ASSERT(false);     

@@ -12,6 +12,10 @@ A static recompilation of **Need for Speed II: Special Edition** and **Need for 
 
 <a href="screenshots/nfsiise-3.png"><img src="screenshots/nfsiise-3.png" alt="nfs2 gameplay" width="50%"></a>
 
+<a href="screenshots/nfsiiihp-1.png"><img src="screenshots/nfsiiihp-1.png" alt="nfs3 menu" width="50%"></a>
+
+<a href="screenshots/nfsiiihp-2.png"><img src="screenshots/nfsiiihp-2.png" alt="nfs3 gameplay" width="50%"></a>
+
 The project automatically disassembles the original PE binaries with a makeshift disassembler, translates the machine code into C++ operating on a virtual x86 CPU struct, and links it against hand-written crappy reimplementations of the Win32 API, DirectX, and 3Dfx Glide — all backed by SDL2 and OpenGL.
 
 ## How it works

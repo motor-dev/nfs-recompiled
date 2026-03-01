@@ -10,7 +10,7 @@
 namespace x86
 {
 
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
     struct Float;
 #endif
 
@@ -22,7 +22,7 @@ namespace x86
         x86::sreg16 data4;
         x86::sreg16 data5;
         inline IEEEf80();
-#if !WITH_PEDANTIC_FPU
+#ifndef WITH_PEDANTIC_FPU
         inline IEEEf80(double value);
 #else
         inline void operator=(const Float &value);
@@ -64,7 +64,7 @@ namespace x86
     {
     }
 
-#if !WITH_PEDANTIC_FPU
+#ifndef WITH_PEDANTIC_FPU
     inline IEEEf80::IEEEf80(double value)
     {
         convert64x80(&value, this);
@@ -83,7 +83,7 @@ namespace x86
         convert64x80(&value, this);
     }
 
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
     struct Float
     {
         IEEEf80 f80value;
@@ -395,7 +395,7 @@ namespace x86
         inline void compare(const Float &val1, const Float &val2)
         {
 
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             x86::reg32 r = cmp80(&val1.f80value, &val2.f80value) & 0x4700;
             status.word &= ~0x4700;
             status.word |= r;
@@ -429,7 +429,7 @@ namespace x86
 
         inline Float log2(const Float &value)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = log280(&result.f80value);
             status.word &= ~0x4700;
@@ -445,7 +445,7 @@ namespace x86
 
         inline Float sin(const Float &value)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = sin80(&result.f80value);
             status.word &= ~0x4700;
@@ -461,7 +461,7 @@ namespace x86
 
         inline Float cos(const Float &value)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = cos80(&result.f80value);
             status.word &= ~0x4700;
@@ -477,7 +477,7 @@ namespace x86
 
         inline Float tan(const Float &value)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = tan80(&result.f80value);
             status.word &= ~0x4700;
@@ -493,7 +493,7 @@ namespace x86
 
         inline Float abs(const Float &value)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = abs80(&result.f80value);
             status.word &= ~0x4700;
@@ -509,7 +509,7 @@ namespace x86
 
         inline Float sqrt(const Float &value)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = sqrt80(&result.f80value);
             status.word &= ~0x4700;
@@ -525,7 +525,7 @@ namespace x86
 
         inline Float atan(const Float &value, const Float &operand)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = atan80(&result.f80value, &operand.f80value);
             status.word &= ~0x4700;
@@ -541,7 +541,7 @@ namespace x86
 
         inline Float rem(const Float &val1, const Float &val2)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = val1;
             x86::reg32 r = rem80(&result.f80value, &val2.f80value);
             status.word &= ~0x4700;
@@ -558,7 +558,7 @@ namespace x86
 
         inline Float scale(const Float &val1, const Float &val2)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = val1;
             x86::reg32 r = scale80(&result.f80value, &val2.f80value);
             status.word &= ~0x4700;
@@ -574,7 +574,7 @@ namespace x86
 
         inline Float f2xm1(const Float &value)
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = value;
             x86::reg32 r = f2xm180(&result.f80value);
             status.word &= ~0x4700;
@@ -590,7 +590,7 @@ namespace x86
 
         Float rndint()
         {
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
             Float result = st(0);
             round80(&result.f80value, control.rc);
 #ifdef NFS2SE_X87_DEBUG
@@ -616,7 +616,7 @@ namespace x86
         }
     };
 
-#if WITH_PEDANTIC_FPU
+#ifdef WITH_PEDANTIC_FPU
     void IEEEf80::operator=(const Float &value)
     {
         *this = value.f80value;
