@@ -1,4 +1,3 @@
 build
 .vscode
-src/nfs2se/disassembly
-src/nfs3hp/disassembly
+**/*.pyc

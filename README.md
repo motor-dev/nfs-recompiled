@@ -16,107 +16,110 @@ A static recompilation of **Need for Speed II: Special Edition** and **Need for 
 
 <a href="screenshots/nfsiiihp-2.png"><img src="screenshots/nfsiiihp-2.png" alt="nfs3 gameplay" width="50%"></a>
 
-The project automatically disassembles the original PE binaries with a makeshift disassembler, translates the machine code into C++ operating on a virtual x86 CPU struct, and links it against hand-written crappy reimplementations of the Win32 API, DirectX, and 3Dfx Glide — all backed by SDL2 and OpenGL.
+## Quick Start: Running the Game
 
-## How it works
+If you have obtained a release binary, here is how to get the game running.
 
-1. **Python disassembler** (`disasm/`) — Uses Capstone to disassemble the original `.exe` and `.dll` files and emit C++ source files that reproduce the original program logic as function calls on a virtual CPU.
-2. **Virtual x86 CPU** — A `x86::CPU` struct (`include/cpu.h`) with general-purpose registers, flags, a full x87 FPU (with optional 80-bit extended precision via NASM routines), and MMX support.
-3. **Win32 API layer** — Minimal, native C++ reimplementations of 18 Win32 API modules (kernel32, user32, gdi32, DirectDraw, DirectInput, DirectSound, Glide 2x, etc.) provide the runtime environment the original code needs (but, really, nothing more).
-4. **SDL2 + OpenGL backend** — Platform services (windowing, audio, input, file I/O, timers, threads) are implemented on top of SDL2. The Glide 2x renderer translates 3Dfx draw calls into OpenGL with a minimal GLSL shader.
+### 1. Game Data
+You need the original game files.
+1.  **Install the game** from your original CD (or mount the iso).
+    On Linux, install the game from the CD-ROM through Wine, e.g. `WINEARCH=win32 WINEPREFIX=/opt/win98 wine /mnt/AUTORUN.EXE`
+2.  **Copy CD data**: The game expects certain files to be on the CD. To run without the CD, copy the `Fedata` and `GameData` folders from the CD-ROM into your game installation directory (merging with existing folders if necessary).
+    *   *Tip*: You can check the `install.win` file in your installation directory. It lists paths; any path starting with a drive letter (like `D:\`) needs to be present on your disk relative to the executable for portable play.
 
-The games work but the SDL backend is sketchy and minimal. I called it good enough when the whole game could run, even if many features are missing.
+### 2. Running
+Run the executable from the terminal. The game supports positional arguments to locate data files.
 
-### Supported games
+| Arguments | Behavior |
+|---|---|
+| **0 args** | `./nfs3hp` | Uses the current directory for both game data and "CD" files. |
+| **1 arg** | `./nfs3hp /path/to/game` | Uses the specified path for both game data and "CD" files. |
+| **2 args** | `./nfs3hp /path/to/install /path/to/cdrom` | Specifies separate paths for the installed files and the CD-ROM content. |
 
-| Game | Executable | DLLs | Target |
-|---|---|---|---|
-| NFS II: SE | `nfs2se/nfs2sen.exe` | `eacsnd.dll` | `nfs2se` |
-| NFS III: HP | `nfs3hp/nfs3.exe` | `eacsnd.dll`, `softtria.dll`, `voodoo2a.dll` | `nfs3hp` |
+**Examples:**
+```bash
+# Data and executable in the same folder
+$ ./nfs3hp
 
-## Prerequisites
+# Executable separate from data
+$ ./build/nfs3hp /home/user/games/nfs3
 
+# Separate install and CD mount
+$ ./build/nfs2se /home/user/games/nfs2 /mnt/cdrom
+```
+
+## Building from source
+
+### Prerequisites
 - CMake ≥ 3.15
 - A C++17 compiler (GCC or Clang)
-- Python 3 (with [Capstone](https://www.capstone-engine.org/) for disassembly)
 - SDL2 development libraries
 - OpenGL development libraries
-- NASM (assembles the x87 FPU helper routines; on Windows it must be invoked with a COFF output format such as `win64`)
+- NASM (for x87 FPU optimizations)
+- Python 3 (only if regenerating disassembly)
 
-### Installing dependencies (Debian / Ubuntu)
-
+**Debian / Ubuntu:**
 ```bash
 sudo apt install build-essential cmake nasm python3 python3-pip \
                libsdl2-dev libgl-dev
-pip3 install capstone
 ```
 
-## Original game files
+### Build Instructions
+Windows users with the bundled SDL2 library can point CMake at the `/sdl2` subdirectory (this is done automatically if you configure from within the project root).
 
-The disassembler only works on the provided executables/dlls. You must supply the original data files yourself, from the CD and an installed folder. 
-
-## Building
-Windows users with the bundled SDL2 library can point CMake at the
-`/sdl2` subdirectory (this is done automatically if you configure from
-within the project root).  The NASM assembler will also switch to the
-appropriate COFF format based on the platform.
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-The first build runs the Python disassembler to generate C++ from the PE binaries. Subsequent builds only regenerate if the disassembly scripts or original binaries change.
-
-### CMake options
-
+### CMake Options
 | Option | Default | Description |
 |---|---|---|
-| `WITH_PEDANTIC_FPU` | `OFF` | Use strict 80-bit extended-precision FPU emulation. |
-| `WITH_MMX` | `ON` | Enable MMX instruction support |
+| `WITH_PEDANTIC_FPU` | `OFF` | Use strict 80-bit extended-precision FPU emulation. Required for NFS3 software renderer glitches on Linux. |
+| `WITH_MMX` | `ON` | Enable MMX instruction support. |
 
 Example:
-
 ```bash
-cmake -B build -DWITH_PEDANTIC_FPU=ON -DWITH_MMX=ON
+cmake -B build -DWITH_PEDANTIC_FPU=ON
 ```
 
-Pedantic FPU is not necessary except for NFS3 if MMX is turned off (defautl is on) AND using the software renderer (default to voodoo).
-In this special case, the game uses the FPU to blit surfaces onto the screen.
-The screen copy loads 80 bits of pixel data into the FPU then stores the 80 bits onto another surface. 
-The default FPU implementation uses ```double``` which is not large enough. Because of this, pixel data is lost and the screen contains vertical lines of random data.
+## Regenerating Disassembled Files
 
-## Running
+The repository contains pre-generated C++ code in `src/nfs2se/disassembly` and `src/nfs3hp/disassembly`. You do not need to run the disassembler to build the project.
 
-```bash
-# NFS II: SE — game data in current directory, CD copied into the game data
-./build/nfs2se
+If you modify the disassembly logic in `disasm/`, you must regenerate the sources:
 
-# NFS III: Hot Pursuit — game data in current directory, CD copied into the game data
-./build/nfs3hp
-```
+1.  Ensure you have the original executables and DLLs:
+    *   **NFS II SE**: Place `nfs2sen.exe` and `eacsnd.dll` in the `nfs2se/` folder.
+    *   **NFS III HP**: Place `nfs3.exe`, `eacsnd.dll`, `softtria.dll`, and `voodoo2a.dll` in the `nfs3hp/` folder.
+2.  Install Python dependencies:
+    ```bash
+    pip3 install capstone
+    ```
+3.  Run the generation scripts:
+    ```bash
+    python3 disassemble_nfs2se.py
+    python3 disassemble_nfs3hp.py
+    ```
 
-### Command-line options
+## Project Structure
 
-Both executables accept the following arguments:
+### Supported Games
+| Game | Executable | Generated Target |
+|---|---|---|
+| NFS II: SE | `nfs2se/nfs2sen.exe` | `nfs2se` |
+| NFS III: HP | `nfs3hp/nfs3.exe` | `nfs3hp` |
 
-| Argument | Description |
-|---|---|
-| `--data <path>` | Path to the local game install directory (default: `./`) |
-| `--cd <path>` | Path to the CD-ROM content directory (default: `./`) |
+### How it works
+1. **Python disassembler** (`disasm/`) — Uses Capstone to disassemble the original `.exe` and `.dll` files and emit C++ source files that reproduce the original program logic as function calls on a virtual CPU.
+2. **Virtual x86 CPU** — A `x86::CPU` struct (`include/cpu.h`) with general-purpose registers, flags, a full x87 FPU (with optional 80-bit extended precision via NASM routines), and MMX support.
+3. **Win32 API layer** — Minimal, native C++ reimplementations of 18 Win32 API modules (kernel32, user32, gdi32, DirectDraw, DirectInput, DirectSound, Glide 2x, etc.) provide the runtime environment the original code needs.
+4. **SDL2 + OpenGL backend** — Platform services (windowing, audio, input, file I/O, timers, threads) are implemented on top of SDL2. The Glide 2x renderer translates 3Dfx draw calls into OpenGL.
 
-The original game executable reads a file called ```install.win``` to know which files are on the CD and which files are on disk.
-It is possible to copy the remaining data from the CD and change ```install.win``` so that it does not need the CD.
-
-```bash
-# Game installed to ~/nfs2se, CD image mounted at /mnt/cdrom
-./build/nfs2se --data ~/nfs2se --cd /mnt/cdrom
-```
-
-## Project structure
-
+### File Tree
 ```
 disasm/                  Python disassembly framework
-  codegen/               x86 instruction → C++ code generators
+  codegen/               x86 instruction -> C++ code generators
   ordlookup/             DLL ordinal-to-name lookup tables
 disassemble_nfs2se.py    Disassembly driver for NFS II: SE
 disassemble_nfs3hp.py    Disassembly driver for NFS III: HP
