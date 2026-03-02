@@ -11,7 +11,7 @@
 #include <lib/thread.h>
 #include <cstring>
 #include <vector>
-#include <SDL2/SDL_log.h>
+#include <SDL_log.h>
 
 namespace win32 { namespace kernel32
 {

@@ -2,7 +2,7 @@
 #define LIB_AUDIO_H_
 #include <lib/winapp.h>
 #include <lib/memmap.h>
-#include <SDL2/SDL_audio.h>
+#include <SDL_audio.h>
 
 
 namespace win32

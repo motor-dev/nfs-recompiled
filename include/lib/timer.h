@@ -3,7 +3,7 @@
 
 #include <lib/winapp.h>
 #include <winapi/types.h>
-#include <SDL2/SDL_timer.h>
+#include <SDL_timer.h>
 
 namespace win32
 {

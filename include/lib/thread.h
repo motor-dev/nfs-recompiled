@@ -2,8 +2,8 @@
 #define LIB_THREAD_H_
 
 #include <lib/winapp.h>
-#include <SDL2/SDL_mutex.h>
-#include <SDL2/SDL_atomic.h>
+#include <SDL_mutex.h>
+#include <SDL_atomic.h>
 
 struct SDL_Thread;
 

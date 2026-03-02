@@ -2,8 +2,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifdef _MSC_VER
-# include <Windows.h>
+#ifdef _WIN32
+# include <windows.h>
 # include <io.h>
 #else
 # include <unistd.h>
@@ -20,7 +20,7 @@
 # define O_BINARY 0
 #endif
 #include <algorithm>
-#include <SDL2/SDL_log.h>
+#include <SDL_log.h>
 
 
 namespace win32
@@ -92,6 +92,11 @@ static std::string resolvePathCaseInsensitive(const std::string& path)
         }
         else
         {
+#ifdef _WIN32
+            /* Windows filesystems are case-insensitive; just append the
+             * component as-is and let the OS handle it. */
+            resolved += component;
+#else
             /* Scan directory for a case-insensitive match */
             const char* dirToOpen = resolved.empty() ? "." : resolved.c_str();
             DIR* dir = opendir(dirToOpen);
@@ -115,6 +120,7 @@ static std::string resolvePathCaseInsensitive(const std::string& path)
                 /* No match found, keep original (e.g. file to be created) */
                 resolved += component;
             }
+#endif
         }
 
         if (end < path.size())

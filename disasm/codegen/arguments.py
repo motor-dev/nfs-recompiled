@@ -44,7 +44,7 @@ def get_mmx_value(instruction, operand):
         else:
             if operand.mem.scale != 1:
                 print('%#x' % instruction.address, instruction.mnemonic, instruction.op_str)
-        return 'x86::regmmx(*app->getMemory<x86::reg64>(%s))' % (' + '.join(offsets))
+        return 'x86::from_reg64(*app->getMemory<x86::reg64>(%s))' % (' + '.join(offsets))
     else:
         assert False, operand.type
 

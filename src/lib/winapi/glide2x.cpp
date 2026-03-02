@@ -375,7 +375,7 @@ static x86::reg32 grSstQueryHardware(WinApplication* app, x86::CPU& cpu, GrHwCon
 {
     NFS2_USE(app);
     NFS2_USE(cpu);
-    memset(hwconfig, 0, sizeof(GrHwConfiguration));
+    SDL_Log("grSstQueryHardware called");
     hwconfig->num_sst = 1;
     hwconfig->SSTs[0].type = GR_SSTTYPE_Voodoo2;
     hwconfig->SSTs[0].fbRam = 16;
@@ -391,7 +391,7 @@ static x86::reg32 grSstQueryBoards(WinApplication* app, x86::CPU& cpu, GrHwConfi
 {
     NFS2_USE(app);
     NFS2_USE(cpu);
-    memset(hwconfig, 0, sizeof(GrHwConfiguration));
+    SDL_Log("grSstQueryBoards called");
     hwconfig->num_sst = 1;
     return true;
 }
@@ -468,6 +468,11 @@ static x86::reg32 grSstWinOpen(WinApplication* app, x86::CPU& cpu, HWND hWnd,
     case GR_RESOLUTION_1024x768:
         width = 1024;
         height = 768;
+        break;
+    default:
+        SDL_Log("Unsupported resolution: %d", resolution);
+        width = 640;
+        height = 480;
         break;
     }
     s_renderer = new Renderer(app, dynamic_cast<Window*>(app->getResource(hWnd)));
@@ -926,6 +931,7 @@ static x86::reg32 grTexCalcMemRequired(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(cpu);
     NFS2_USE(fmt);
     NFS2_ASSERT(aspect == GR_ASPECT_1x1);
+    SDL_Log("grTexCalcMemRequired called with lodmin=%d, lodmax=%d", lodmin, lodmax);
     return s_glideRenderer->getTextureMemSize(256 >> lodmin, 256 >> lodmax, TF_RGB_565);
 }
 

@@ -2,7 +2,7 @@
 #define LIB_GAMEPAD_H_
 
 #include <lib/winapp.h>
-#include <SDL2/SDL_joystick.h>
+#include <SDL_joystick.h>
 
 
 namespace win32

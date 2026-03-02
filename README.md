@@ -41,7 +41,7 @@ The games work but the SDL backend is sketchy and minimal. I called it good enou
 - Python 3 (with [Capstone](https://www.capstone-engine.org/) for disassembly)
 - SDL2 development libraries
 - OpenGL development libraries
-- NASM (assembles the x87 FPU helper routines)
+- NASM (assembles the x87 FPU helper routines; on Windows it must be invoked with a COFF output format such as `win64`)
 
 ### Installing dependencies (Debian / Ubuntu)
 
@@ -56,7 +56,10 @@ pip3 install capstone
 The disassembler only works on the provided executables/dlls. You must supply the original data files yourself, from the CD and an installed folder. 
 
 ## Building
-
+Windows users with the bundled SDL2 library can point CMake at the
+`/sdl2` subdirectory (this is done automatically if you configure from
+within the project root).  The NASM assembler will also switch to the
+appropriate COFF format based on the platform.
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build

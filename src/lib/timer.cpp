@@ -1,6 +1,6 @@
 #include <lib/timer.h>
 #include <time.h>
-#include <SDL2/SDL_log.h>
+#include <SDL_log.h>
 #ifdef _WIN32
 # define localtime_r(a,b)  localtime_s(b,a)
 #endif

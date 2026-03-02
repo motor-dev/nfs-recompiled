@@ -1,6 +1,6 @@
 #include <lib/gamepad.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_log.h>
+#include <SDL_events.h>
+#include <SDL_log.h>
 
 
 namespace win32

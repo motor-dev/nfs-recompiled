@@ -83,7 +83,7 @@ class Application(Module):
                 src.write('}\n')
 
                 for index in range(0, 1+int(len(self.subroutines)/100)):
-                    methods = open('src/%s/%s.%d.cpp' % (app_name, app_name, index), 'w')
+                    methods = open('src/%s/disassembly/%s.%d.cpp' % (app_name, app_name, index), 'w')
                     methods.write('#include "%s.h"\n'
                                   '#include <lib/thread.h>\n\n'
                                   'namespace %s\n'

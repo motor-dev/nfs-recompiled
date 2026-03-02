@@ -4,9 +4,9 @@
 #include <lib/library.h>
 #include <lib/registry.h>
 #include <winapi/types.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_atomic.h>
-#include <SDL2/SDL_mutex.h>
+#include <SDL_timer.h>
+#include <SDL_atomic.h>
+#include <SDL_mutex.h>
 #include <x86.h>
 
 #include <winapi/dsetup.h>

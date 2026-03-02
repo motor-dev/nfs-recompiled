@@ -1,19 +1,12 @@
-#include <SDL2/SDL_main.h>
-#include <SDL2/SDL.h>
+#include <SDL_main.h>
+#include <SDL.h>
 #include <lib/file.h>
 #include <nfs2se.h>
 #include <cstring>
 
-#ifdef _WIN32
-__declspec(dllimport) void dbgsetup();
-#else
-# define dbgsetup()
-#endif
-
 int main(int argc, char* argv[])
 {
     NFS2_USE(argc);
-    dbgsetup();
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--data") == 0 && i + 1 < argc)

@@ -1,6 +1,6 @@
 #include <lib/event.h>
 #include <lib/thread.h>
-#include <SDL2/SDL_mutex.h>
+#include <SDL_mutex.h>
 #include <algorithm>
 
 namespace win32

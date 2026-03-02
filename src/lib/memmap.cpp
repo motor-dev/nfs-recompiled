@@ -1,5 +1,5 @@
 #include <lib/memmap.h>
-#include <SDL2/SDL_mutex.h>
+#include <SDL_mutex.h>
 #include <vector>
 #ifdef _WIN32
 # include <windows.h>
@@ -38,6 +38,7 @@ static void* alloc(x86::reg32 size)
 static void dealloc(void* mem, x86::reg32 size)
 {
 #ifdef _WIN32
+    NFS2_USE(size);
     VirtualFree(mem, 0, MEM_RELEASE);
 #else
     munmap(mem, size);
@@ -47,6 +48,10 @@ static void dealloc(void* mem, x86::reg32 size)
 static void protect(void* mem, x86::reg32 size, bool read, bool write)
 {
 #ifdef _WIN32
+    NFS2_USE(mem);
+    NFS2_USE(size);
+    NFS2_USE(read);
+    NFS2_USE(write);
 #else
     int protection = PROT_NONE;
     if (read)

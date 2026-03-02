@@ -1,7 +1,7 @@
 #include <lib/socket.h>
 //#include <winsock.h>
 #include <cstdio>
-#include <SDL2/SDL_net.h>
+//#include <SDL2/SDL_net.h>
 
 namespace win32
 {

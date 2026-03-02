@@ -1,12 +1,12 @@
 #include <lib/thread.h>
 #include <lib/event.h>
 #include <lib/window.h>
-#include <SDL2/SDL_thread.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_mutex.h>
-#include <SDL2/SDL_atomic.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_log.h>
+#include <SDL_thread.h>
+#include <SDL_events.h>
+#include <SDL_mutex.h>
+#include <SDL_atomic.h>
+#include <SDL_timer.h>
+#include <SDL_log.h>
 
 namespace win32
 {

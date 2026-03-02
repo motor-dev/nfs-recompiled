@@ -1,9 +1,9 @@
 #include <lib/window.h>
 #include <lib/thread.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_log.h>
+#include <SDL_video.h>
+#include <SDL_events.h>
+#include <SDL_render.h>
+#include <SDL_log.h>
 #include <cstring>
 
 #define WM_KEYDOWN  0x0100
@@ -48,6 +48,11 @@ WindowClass::~WindowClass()
 Window::Window(const char *title, int x, int y, int w, int h)
     :   m_window(SDL_CreateWindow(title, x+5, y+30, w, h, SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL))
 {
+    if (!m_window)
+    {
+        SDL_Log("Failed to create window: %s", SDL_GetError());
+        return;
+    }
 }
 
 Window::~Window()

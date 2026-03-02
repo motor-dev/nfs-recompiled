@@ -1,7 +1,7 @@
 #include <lib/audio.h>
 #include <lib/mutex.h>
-#include <SDL2/SDL_mutex.h>
-#include <SDL2/SDL_log.h>
+#include <SDL_mutex.h>
+#include <SDL_log.h>
 #include <vector>
 #include <algorithm>
 

@@ -11,14 +11,6 @@ namespace x86
 struct regmmx
 {
     __m128i reg;
-    regmmx()
-        :   reg()
-    {
-    }
-    regmmx(const x86::reg64& value)
-        :   reg(_mm_cvtsi64_si128(value))
-    {
-    }
     operator x86::reg64() const
     {
         return _mm_cvtsi128_si64(reg);
@@ -27,12 +19,14 @@ struct regmmx
     {
         return reg;
     }
-    regmmx& operator=(const __m128i& other)
-    {
-        reg = other;
-        return *this;
-    }
 };
+
+static inline regmmx from_reg64(const x86::reg64& value)
+{
+    regmmx result;
+    result.reg = _mm_cvtsi64_si128(value);
+    return result;
+}
 
 struct MMX
 {

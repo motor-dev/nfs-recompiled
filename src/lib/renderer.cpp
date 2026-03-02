@@ -1,10 +1,10 @@
 #include <lib/renderer.h>
 #include <lib/window.h>
 #include <lib/gamepad.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_opengl.h>
-#include <SDL2/SDL_log.h>
+#include <SDL_render.h>
+#include <SDL_video.h>
+#include <SDL_opengl.h>
+#include <SDL_log.h>
 #include <GL/gl.h>
 
 namespace win32
@@ -31,9 +31,11 @@ Renderer::Renderer(WinApplication* application, Window *window)
     setCurrent();
     SDL_GL_SetSwapInterval(1);
     glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)SDL_GL_GetProcAddress("glDebugMessageCallback");
-    
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(errorCallback, 0);
+    if (glDebugMessageCallback)
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(errorCallback, 0);
+    }
 
     glGenTextures(1, &m_texture);
     glBindTexture(GL_TEXTURE_2D, m_texture);
