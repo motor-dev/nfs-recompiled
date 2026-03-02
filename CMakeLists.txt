@@ -13,9 +13,6 @@ if(WITH_MMX)
     add_compile_definitions(WITH_MMX)
 endif()
 
-# find dependencies
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
-
 # Detect Windows target: covers native Windows (WIN32/MINGW), an explicit
 # -DCMAKE_SYSTEM_NAME=Windows, and cross-compilation via a MinGW toolchain
 # supplied directly with -DCMAKE_C_COMPILER=…/x86_64-w64-mingw32-gcc (in

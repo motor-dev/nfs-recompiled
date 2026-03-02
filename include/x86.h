@@ -34,7 +34,7 @@ struct FPU;
 
 }
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 # include <intrin.h>
 static inline x86::reg32 __builtin_clz(x86::reg32 value)
 {

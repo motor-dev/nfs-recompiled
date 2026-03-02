@@ -1,5 +1,4 @@
 #include <SDL_main.h>
-#include <SDL.h>
 #include <lib/file.h>
 #include <lib/registry.h>
 #include <nfs3hp.h>

@@ -1,5 +1,4 @@
 #include <SDL_main.h>
-#include <SDL.h>
 #include <lib/file.h>
 #include <nfs2se.h>
 #include <string>
