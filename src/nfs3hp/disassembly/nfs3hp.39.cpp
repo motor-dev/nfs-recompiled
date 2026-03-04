@@ -10337,7 +10337,7 @@ void Application::sub_4f80b4(WinApplication* app, x86::CPU& cpu)
         cpu.set_szp(tmp1);
     }
     // 004f80bc  dc156c715600           +fcom qword ptr [0x56716c]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(x86::reg32(5665132) /* 0x56716c */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(x86::reg32(5665132) /* 0x56716c */)));
     // 004f80c2  9b                     -wait 
     /*nothing*/;
     // 004f80c3  dd7df0                 -fnstsw word ptr [ebp - 0x10]
@@ -10393,7 +10393,7 @@ L_0x004f80df:
     return;
 L_0x004f80e5:
     // 004f80e5  dc1574715600           +fcom qword ptr [0x567174]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(x86::reg32(5665140) /* 0x567174 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(x86::reg32(5665140) /* 0x567174 */)));
     // 004f80eb  9b                     -wait 
     /*nothing*/;
     // 004f80ec  dd7df0                 -fnstsw word ptr [ebp - 0x10]
@@ -10482,7 +10482,7 @@ void Application::sub_4f80e5(WinApplication* app, x86::CPU& cpu)
         cpu.set_szp(tmp1);
     }
     // 004f80bc  dc156c715600           +fcom qword ptr [0x56716c]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(x86::reg32(5665132) /* 0x56716c */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(x86::reg32(5665132) /* 0x56716c */)));
     // 004f80c2  9b                     -wait 
     /*nothing*/;
     // 004f80c3  dd7df0                 -fnstsw word ptr [ebp - 0x10]
@@ -10539,7 +10539,7 @@ L_0x004f80df:
 L_0x004f80e5:
 L_entry_0x004f80e5:
     // 004f80e5  dc1574715600           +fcom qword ptr [0x567174]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(x86::reg32(5665140) /* 0x567174 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(x86::reg32(5665140) /* 0x567174 */)));
     // 004f80eb  9b                     -wait 
     /*nothing*/;
     // 004f80ec  dd7df0                 -fnstsw word ptr [ebp - 0x10]
@@ -10629,7 +10629,7 @@ L_entry_0x004f80b6:
         cpu.set_szp(tmp1);
     }
     // 004f80bc  dc156c715600           +fcom qword ptr [0x56716c]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(x86::reg32(5665132) /* 0x56716c */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(x86::reg32(5665132) /* 0x56716c */)));
     // 004f80c2  9b                     -wait 
     /*nothing*/;
     // 004f80c3  dd7df0                 -fnstsw word ptr [ebp - 0x10]
@@ -10685,7 +10685,7 @@ L_0x004f80df:
     return;
 L_0x004f80e5:
     // 004f80e5  dc1574715600           +fcom qword ptr [0x567174]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(x86::reg32(5665140) /* 0x567174 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(x86::reg32(5665140) /* 0x567174 */)));
     // 004f80eb  9b                     -wait 
     /*nothing*/;
     // 004f80ec  dd7df0                 -fnstsw word ptr [ebp - 0x10]

@@ -21408,7 +21408,7 @@ L_0x0044d95c:
     // 0044d960  db442408               +fild dword ptr [esp + 8]
     cpu.fpu.push(x86::Float(x86::sreg32(app->getMemory<x86::reg32>(cpu.esp + x86::reg32(8) /* 0x8 */))));
     // 0044d964  dc1d10ac4b00           +fcomp qword ptr [0x4bac10]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(x86::reg32(4959248) /* 0x4bac10 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(x86::reg32(4959248) /* 0x4bac10 */)));
     cpu.fpu.pop();
     // 0044d96a  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;

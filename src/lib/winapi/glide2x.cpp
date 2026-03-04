@@ -375,7 +375,6 @@ static x86::reg32 grSstQueryHardware(WinApplication* app, x86::CPU& cpu, GrHwCon
 {
     NFS2_USE(app);
     NFS2_USE(cpu);
-    SDL_Log("grSstQueryHardware called");
     hwconfig->num_sst = 1;
     hwconfig->SSTs[0].type = GR_SSTTYPE_Voodoo2;
     hwconfig->SSTs[0].fbRam = 16;
@@ -391,7 +390,6 @@ static x86::reg32 grSstQueryBoards(WinApplication* app, x86::CPU& cpu, GrHwConfi
 {
     NFS2_USE(app);
     NFS2_USE(cpu);
-    SDL_Log("grSstQueryBoards called");
     hwconfig->num_sst = 1;
     return true;
 }
@@ -470,7 +468,7 @@ static x86::reg32 grSstWinOpen(WinApplication* app, x86::CPU& cpu, HWND hWnd,
         height = 768;
         break;
     default:
-        SDL_Log("Unsupported resolution: %d", resolution);
+        SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Unsupported resolution: %d", resolution);
         width = 640;
         height = 480;
         break;

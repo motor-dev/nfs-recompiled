@@ -8,7 +8,7 @@
 #include    <map>
 #include    <string>
 #include    <unordered_map>
-#include    <SDL.h>
+#include    <SDL3/SDL.h>
 
 namespace win32
 {
@@ -66,6 +66,7 @@ private:
     x86::reg8* address;
 
 public:
+    MemoryAccessor(const MemoryAccessor& other) = default;
     MemoryAccessor& operator=(const MemoryAccessor& other)
     {
         if (this != &other)
@@ -100,12 +101,11 @@ private:
     x86::reg8* address;
 
 public:
+    MemoryAccessor(const MemoryAccessor& other) = default;
     MemoryAccessor& operator=(const MemoryAccessor& other) = delete;
-    operator float() const { x86::IEEEf80Data result; memcpy(&result, address, sizeof(x86::IEEEf80Data)); return float(x86::IEEEf80(result)); }
-    operator double() const { x86::IEEEf80Data result; memcpy(&result, address, sizeof(x86::IEEEf80Data)); return double(x86::IEEEf80(result)); }
+    operator x86::Float() const { x86::IEEEf80Data result; memcpy(&result, address, sizeof(x86::IEEEf80Data)); return double(x86::IEEEf80(result)); }
     operator x86::IEEEf80() const { x86::IEEEf80Data result; memcpy(&result, address, sizeof(x86::IEEEf80Data)); return x86::IEEEf80(result); }
-    MemoryAccessor& operator=(float value) { x86::IEEEf80 f80value(value); memcpy(address, &f80value.data, sizeof(x86::IEEEf80Data)); return *this; }
-    MemoryAccessor& operator=(double value) { x86::IEEEf80 f80value(value); memcpy(address, &f80value.data, sizeof(x86::IEEEf80Data)); return *this; }
+    MemoryAccessor& operator=(x86::Float value) { x86::IEEEf80 f80value(value); memcpy(address, &f80value.data, sizeof(x86::IEEEf80Data)); return *this; }
     MemoryAccessor& operator=(x86::IEEEf80 value) { memcpy(address, &value.data, sizeof(x86::IEEEf80Data)); return *this; }
 };
 
@@ -118,6 +118,7 @@ private:
     x86::reg8* address;
 
 public:
+    MemoryAccessor(const MemoryAccessor& other) = default;
     MemoryAccessor& operator=(const MemoryAccessor& other) = delete;
     void* operator&() { return reinterpret_cast<void*>(address); }
 };
@@ -131,6 +132,7 @@ private:
     x86::reg8* address;
 
 public:
+    MemoryAccessor(const MemoryAccessor& other) = default;
     MemoryAccessor& operator=(const MemoryAccessor& other) = delete;
     const void* operator&() { return reinterpret_cast<const void*>(address); }
 };
@@ -165,7 +167,7 @@ public:
     inline void dynamic_call(uint32_t address, x86::CPU& cpu)
     {
         const win32::Method& m = m_methods.find(address-0x400000)->second;
-        //SDL_Log("[%lu] Calling method: %s", SDL_ThreadID(), m.name.c_str());
+        //SDL_LogDebug("[%lu] Calling method: %s", SDL_ThreadID(), m.name.c_str());
         m(this, cpu);
     }
 

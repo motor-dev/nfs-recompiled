@@ -1,7 +1,6 @@
 #include <lib/audio.h>
 #include <lib/mutex.h>
-#include <SDL_mutex.h>
-#include <SDL_log.h>
+#include <SDL3/SDL.h>
 #include <vector>
 #include <algorithm>
 
@@ -13,33 +12,28 @@ static const x86::reg32 s_sampleCount = 4096;
 static const x86::reg32 s_sampleSize = s_sampleCount * s_channelCount;
 
 AudioDevice::AudioDevice()
-    :   m_id(0)
+    :   m_stream(nullptr)
 {
-    SDL_AudioSpec audioSpecIn =
-    {
-        22050,
-        AUDIO_S16,
-        s_channelCount,
-        0,
-        256,
-        0,
-        0,
+    SDL_AudioSpec audioSpec;
+    audioSpec.format   = SDL_AUDIO_S16;
+    audioSpec.channels = s_channelCount;
+    audioSpec.freq     = 22050;
+    m_stream = SDL_OpenAudioDeviceStream(
+        SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK,
+        &audioSpec,
         &audioCallback22050,
-        this
-    };
-    SDL_AudioSpec audioSpecReceived;
-    m_id = SDL_OpenAudioDevice(nullptr, 0, &audioSpecIn, &audioSpecReceived, 0);
+        this);
 }
 
 AudioDevice::~AudioDevice()
 {
-    SDL_CloseAudioDevice(m_id);;
+    SDL_DestroyAudioStream(m_stream);
 }
 
 void AudioDevice::play(AudioBuffer* buffer)
 {
     if (m_playingBuffers.empty())
-        SDL_PauseAudioDevice(m_id, 0);
+        SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(m_stream));
     m_playingBuffers.push_back(buffer);
 }
 
@@ -47,21 +41,21 @@ void AudioDevice::stop(AudioBuffer* buffer)
 {
     m_playingBuffers.erase(std::remove(m_playingBuffers.begin(), m_playingBuffers.end(), buffer), m_playingBuffers.end());
     if (m_playingBuffers.empty())
-        SDL_PauseAudioDevice(m_id, 1);
+        SDL_PauseAudioDevice(SDL_GetAudioStreamDevice(m_stream));
 }
 
 
-void AudioDevice::audioCallback22050(void* userdata, x86::reg8* stream, int len)
+void AudioDevice::audioCallback22050(void* userdata, SDL_AudioStream* stream, int additional_amount, int /*total_amount*/)
 {
-    SDL_LockAudio();
     AudioDevice* audio = reinterpret_cast<AudioDevice*>(userdata);
+    std::vector<x86::reg8> buffer(additional_amount, 0);
     for (std::vector<AudioBuffer*>::iterator it = audio->m_playingBuffers.begin();
         it != audio->m_playingBuffers.end();
         ++it)
     {
-        (*it)->audioCallback22050(stream, len);
+        (*it)->audioCallback22050(buffer.data(), additional_amount);
     }
-    SDL_UnlockAudio();
+    SDL_PutAudioStreamData(stream, buffer.data(), additional_amount);
     return;
 }
 
@@ -173,9 +167,9 @@ x86::reg32 AudioBuffer::lock()
 
 void AudioBuffer::unlock(x86::reg32 bufferWritten)
 {
-    SDL_LockAudio();
+    SDL_LockAudioStream(m_device->stream());
     m_playStop += bufferWritten;
-    SDL_UnlockAudio();
+    SDL_UnlockAudioStream(m_device->stream());
 }
 
 

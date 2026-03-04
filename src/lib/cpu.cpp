@@ -1,6 +1,6 @@
 #include <cpu.h>
 //#include <intrin.h>
-#include <SDL_timer.h>
+#include <SDL3/SDL.h>
 #include <cstring>
 
 namespace x86

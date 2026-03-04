@@ -2,7 +2,7 @@
 #include <x86.h>
 #include <lib/window.h>
 #include <cctype>
-#include <SDL_messagebox.h>
+#include <SDL3/SDL.h>
 
 namespace win32 { namespace user32
 {
@@ -373,19 +373,11 @@ int MessageBoxA(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(app);
     NFS2_USE(cpu);
     NFS2_USE(hWnd);
-    if (uType & 0x0001)
-    {
-        SDL_Log("[error] %s", lpCaption);
-    }
-    else if (uType & 0x0002)
-    {
-        SDL_Log("[warning] %s", lpCaption);
-    }
-    else
-    {
-        SDL_Log("[info] %s", lpCaption);
-    }
-    SDL_Log("%s", lpText);
+    Uint32 type = 0;
+    if (uType & 0x0001) type |= SDL_MESSAGEBOX_ERROR;
+    if (uType & 0x0002) type |= SDL_MESSAGEBOX_WARNING;
+    if (uType & 0x0000) type |= SDL_MESSAGEBOX_INFORMATION;
+    SDL_ShowSimpleMessageBox(type, lpCaption, lpText, nullptr);
     return 0;
 }
 

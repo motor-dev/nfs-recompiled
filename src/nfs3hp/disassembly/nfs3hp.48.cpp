@@ -6475,7 +6475,7 @@ start:
     cpu.clear_co();
     cpu.set_szp((cpu.edx ^= x86::reg32(x86::sreg32(cpu.edx))));
     // 0051f3a4  d8d1                   +fcom st(1)
-    cpu.fpu.compare(cpu.fpu.st(0), cpu.fpu.st(1));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(cpu.fpu.st(1)));
     // 0051f3a6  50                     -push eax
     app->getMemory<x86::reg32>(cpu.esp-4) = cpu.eax;
     cpu.esp -= 4;

@@ -3,11 +3,15 @@
 
 #include <lib/winapp.h>
 #include <winapi/types.h>
-
-struct SDL_Window;
+#include <SDL3/SDL.h>
 
 namespace win32
 {
+
+extern Uint32 g_userEvent;
+extern Uint32 g_userEvent1;
+extern Uint32 g_userEvent2;
+extern Uint32 g_wmCharEvent;
 
 class WindowClass : public GenericResource
 {

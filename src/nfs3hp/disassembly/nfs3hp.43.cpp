@@ -2338,7 +2338,7 @@ L_0x00504a6e:
     // 00504aa3  d9ee                   +fldz 
     cpu.fpu.push(0.0);
     // 00504aa5  d85c2404               +fcomp dword ptr [esp + 4]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<float>(cpu.esp + x86::reg32(4) /* 0x4 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<float>(cpu.esp + x86::reg32(4) /* 0x4 */)));
     cpu.fpu.pop();
     // 00504aa9  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;

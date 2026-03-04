@@ -2123,7 +2123,7 @@ L_0x004458ac:
     app->getMemory<float>(cpu.ebp + x86::reg32(-36) /* -0x24 */) = float(cpu.fpu.st(0));
     cpu.fpu.pop();
     // 00445954  d85df4                 +fcomp dword ptr [ebp - 0xc]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<float>(cpu.ebp + x86::reg32(-12) /* -0xc */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<float>(cpu.ebp + x86::reg32(-12) /* -0xc */)));
     cpu.fpu.pop();
     // 00445957  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;
@@ -2147,7 +2147,7 @@ L_0x00445964:
     // 00445967  d945f8                 +fld dword ptr [ebp - 8]
     cpu.fpu.push(x86::Float(app->getMemory<float>(cpu.ebp + x86::reg32(-8) /* -0x8 */)));
     // 0044596a  d85dec                 +fcomp dword ptr [ebp - 0x14]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<float>(cpu.ebp + x86::reg32(-20) /* -0x14 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<float>(cpu.ebp + x86::reg32(-20) /* -0x14 */)));
     cpu.fpu.pop();
     // 0044596d  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;
@@ -2193,7 +2193,7 @@ L_0x00445988:
     app->getMemory<x86::reg32>(x86::reg32(5606208) /* 0x558b40 */) = x86::reg32(x86::sreg32(cpu.fpu.rndint()));
     cpu.fpu.pop();
     // 004459a7  d85df4                 +fcomp dword ptr [ebp - 0xc]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<float>(cpu.ebp + x86::reg32(-12) /* -0xc */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<float>(cpu.ebp + x86::reg32(-12) /* -0xc */)));
     cpu.fpu.pop();
     // 004459aa  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;
@@ -2217,7 +2217,7 @@ L_0x004459b7:
     // 004459ba  d945f8                 +fld dword ptr [ebp - 8]
     cpu.fpu.push(x86::Float(app->getMemory<float>(cpu.ebp + x86::reg32(-8) /* -0x8 */)));
     // 004459bd  d85dec                 +fcomp dword ptr [ebp - 0x14]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<float>(cpu.ebp + x86::reg32(-20) /* -0x14 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<float>(cpu.ebp + x86::reg32(-20) /* -0x14 */)));
     cpu.fpu.pop();
     // 004459c0  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;

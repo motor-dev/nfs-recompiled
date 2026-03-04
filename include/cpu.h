@@ -113,7 +113,6 @@ struct CPU
     }
     inline void init(reg32 fs, reg32 ip)
     {
-        memset(this, 0, sizeof(*this));
         fpu.init();
         terminate = false;
         this->flags.eflags = 0x00200202;

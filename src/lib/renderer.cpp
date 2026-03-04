@@ -1,10 +1,8 @@
 #include <lib/renderer.h>
 #include <lib/window.h>
 #include <lib/gamepad.h>
-#include <SDL_render.h>
-#include <SDL_video.h>
-#include <SDL_opengl.h>
-#include <SDL_log.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
 #include <GL/gl.h>
 
 namespace win32
@@ -13,7 +11,7 @@ namespace win32
 void GLAPIENTRY errorCallback(GLenum /*source*/, GLenum type, GLuint /*id*/, GLenum severity, GLsizei /*length*/, const GLchar* message, const void* /*userParam*/)
 {
     if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
-    SDL_Log("OpenGL: %s type = 0x%x, severity = 0x%x, \"%s\"\n",
+    SDL_LogError(SDL_LOG_CATEGORY_RENDER, "OpenGL: %s type = 0x%x, severity = 0x%x, \"%s\"\n",
             (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
             type, severity, message);
 }
@@ -46,12 +44,12 @@ Renderer::Renderer(WinApplication* application, Window *window)
 
 Renderer::~Renderer()
 {
-    SDL_GL_DeleteContext(m_renderer);
+    SDL_GL_DestroyContext(static_cast<SDL_GLContext>(m_renderer));
 }
 
 void Renderer::setCurrent()
 {
-    SDL_GL_MakeCurrent(m_window->m_window, m_renderer);
+    SDL_GL_MakeCurrent(m_window->m_window, static_cast<SDL_GLContext>(m_renderer));
 }
 
 void Renderer::clearCurrent()
@@ -92,7 +90,7 @@ void Renderer::present()
     Gamepad::updateKeys();
     glBindTexture(GL_TEXTURE_2D, m_texture);
     int w, h;
-    SDL_GL_GetDrawableSize(m_window->m_window, &w, &h);
+    SDL_GetWindowSizeInPixels(m_window->m_window, &w, &h);
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -163,11 +161,10 @@ void Renderer::unlock(x86::reg32 index)
 void Renderer::swap()
 {
     setCurrent();
-    SDL_DisplayMode mode;
-    SDL_GetCurrentDisplayMode(0, &mode);
+    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
     SDL_GL_SetSwapInterval(1);
     m_currentBuffer = 1 - m_currentBuffer;
-    for (int i = 0; i < mode.refresh_rate / 30; ++i)
+    for (int i = 0; i < (mode ? (int)(mode->refresh_rate / 30) : 2); ++i)
         update();
     clearCurrent();
 }

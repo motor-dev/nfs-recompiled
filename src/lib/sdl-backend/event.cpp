@@ -1,13 +1,13 @@
 #include <lib/event.h>
 #include <lib/thread.h>
-#include <SDL_mutex.h>
+#include <SDL3/SDL.h>
 #include <algorithm>
 
 namespace win32
 {
 
-static SDL_mutex* s_mutex = nullptr;
-static SDL_cond* s_condition = nullptr;
+static SDL_Mutex* s_mutex = nullptr;
+static SDL_Condition* s_condition = nullptr;
 
 static const x86::sreg32 WAIT_TIMEOUT = 0x102;
 
@@ -29,19 +29,19 @@ Event::~Event()
 void Event::init()
 {
     s_mutex = SDL_CreateMutex();
-    s_condition = SDL_CreateCond();
+    s_condition = SDL_CreateCondition();
 }
 
 void Event::fini()
 {
-    SDL_DestroyCond(s_condition);
+    SDL_DestroyCondition(s_condition);
     SDL_DestroyMutex(s_mutex);
 }
 
 void Event::broadcastTerminate()
 {
     SDL_LockMutex(s_mutex);
-    SDL_CondBroadcast(s_condition);
+    SDL_BroadcastCondition(s_condition);
     SDL_UnlockMutex(s_mutex);
 }
 
@@ -51,7 +51,7 @@ void Event::set()
     //SDL_Log("Event set: %s<%u>", m_name.c_str(), m_id);
     m_pulse = false;
     m_isSet = true;
-    SDL_CondBroadcast(s_condition);
+    SDL_BroadcastCondition(s_condition);
     SDL_UnlockMutex(s_mutex);
 }
 
@@ -63,7 +63,7 @@ x86::reg32 Event::pulse()
     {
         m_pulse = true;
         m_isSet = true;
-        SDL_CondBroadcast(s_condition);
+        SDL_BroadcastCondition(s_condition);
     }
     SDL_UnlockMutex(s_mutex);
     return 1;
@@ -102,14 +102,9 @@ x86::reg32 Event::wait(x86::CPU& cpu, Event** begin, Event** end, bool waitAll, 
             result = x86::reg32(-1);
             break;
         }
-        int event = SDL_CondWaitTimeout(s_condition, s_mutex, timeout);
-        if (event == SDL_MUTEX_TIMEDOUT)
+        bool event = SDL_WaitConditionTimeout(s_condition, s_mutex, timeout);
+        if (!event)
         {
-            break;
-        }
-        else if (event < 0)
-        {
-            result = x86::reg32(-1);
             break;
         }
     }

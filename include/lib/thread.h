@@ -2,8 +2,7 @@
 #define LIB_THREAD_H_
 
 #include <lib/winapp.h>
-#include <SDL_mutex.h>
-#include <SDL_atomic.h>
+#include <SDL3/SDL.h>
 
 struct SDL_Thread;
 
@@ -40,10 +39,11 @@ private:
         x86::reg32      m_entryPoint;
         x86::reg32      m_parameter;
         x86::reg32      m_flags;
+        x86::reg32      m_threadId;
     };
 
-    SDL_atomic_t*   m_refCount;
-    SDL_sem*        m_semaphore;
+    SDL_AtomicInt*  m_refCount;
+    SDL_Semaphore*  m_semaphore;
     Data            m_data;
     SDL_Thread*     m_thread;
     x86::CPU        m_cpu;

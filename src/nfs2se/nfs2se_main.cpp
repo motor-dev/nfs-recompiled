@@ -1,4 +1,4 @@
-#include <SDL_main.h>
+#include <SDL3/SDL_main.h>
 #include <lib/file.h>
 #include <nfs2se.h>
 #include <string>
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
         win32::File::setDataDirectory(exeDir.c_str());
         win32::File::setCdDirectory(exeDir.c_str());
     }
-    SDL_Init(SDL_INIT_TIMER|SDL_INIT_EVENTS|SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
+    SDL_Init(SDL_INIT_EVENTS|SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
     {
         nfs2se::Application app(argv[0]);
         app.execute();

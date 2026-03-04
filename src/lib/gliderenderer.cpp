@@ -1,10 +1,8 @@
 #include <lib/gliderenderer.h>
 #include <lib/renderer.h>
 #include <lib/glidetmu.h>
-#include <SDL_render.h>
-#include <SDL_video.h>
-#include <SDL_log.h>
-#include <SDL_opengl.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
 
 namespace win32
 {
@@ -260,7 +258,7 @@ void GlideRenderer::compileShaders()
         {
             GLchar *log = (GLchar *)malloc(maxLen);
             glGetShaderInfoLog(vertexShader, maxLen, &len, log);
-            SDL_Log("%s", log);
+            SDL_LogError(SDL_LOG_CATEGORY_RENDER, "%s", log);
             free(log);
         }
     }
@@ -278,7 +276,7 @@ void GlideRenderer::compileShaders()
         {
             GLchar *log = (GLchar *)malloc(maxLen);
             glGetShaderInfoLog(fragmentShader, maxLen, &len, log);
-            SDL_Log("%s", log);
+            SDL_LogError(SDL_LOG_CATEGORY_RENDER, "%s", log);
             free(log);
         }
     }
@@ -298,7 +296,7 @@ void GlideRenderer::compileShaders()
         {
             GLchar *log = (GLchar *)malloc(maxLen);
             glGetProgramInfoLog(m_shaderProgram, maxLen, &len, log);
-            SDL_Log("%s", log);
+            SDL_LogError(SDL_LOG_CATEGORY_RENDER, "%s", log);
             free(log);
         }
     }
@@ -344,9 +342,8 @@ void GlideRenderer::swap()
     m_renderer->setCurrent();
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderer->m_texture, 0);
-    SDL_DisplayMode mode;
-    SDL_GetCurrentDisplayMode(0, &mode);
-    SDL_GL_SetSwapInterval(mode.refresh_rate / 60);
+    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(SDL_GetPrimaryDisplay());
+    SDL_GL_SetSwapInterval(mode ? (int)(mode->refresh_rate / 60) : 1);
     if (m_vertexCount)
     {
         flush();

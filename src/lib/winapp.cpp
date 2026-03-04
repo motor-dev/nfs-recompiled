@@ -4,9 +4,7 @@
 #include <lib/library.h>
 #include <lib/registry.h>
 #include <winapi/types.h>
-#include <SDL_timer.h>
-#include <SDL_atomic.h>
-#include <SDL_mutex.h>
+#include <SDL3/SDL.h>
 #include <x86.h>
 
 #include <winapi/dsetup.h>
@@ -18,18 +16,18 @@ namespace win32
 {
 
 static x86::reg32 s_resourceIndex;
-static SDL_atomic_t s_resourceCount;
+static SDL_AtomicInt s_resourceCount;
 
 GenericResource::GenericResource()
     :   m_resourceIndex(0)
 {
-    SDL_AtomicAdd(&s_resourceCount, 1);
+    SDL_AddAtomicInt(&s_resourceCount, 1);
 }
 
 GenericResource::~GenericResource()
 {
     NFS2_ASSERT(m_resourceIndex == 0);
-    SDL_AtomicAdd(&s_resourceCount, -1);
+    SDL_AddAtomicInt(&s_resourceCount, -1);
 }
 
 void GenericResource::setResourceIndex(x86::reg32 resourceIndex)
@@ -51,16 +49,15 @@ WinApplication::WinApplication(const char* appName, x86::reg32 baseAddress, cons
     ,   m_env(new MemMap(4096))
     ,   m_executionContext(new Mutex("ExecutionContext"))
     ,   m_resourceContext(new Mutex("Resource"))
+    ,   m_cpu{}
 {
     /*m_methods = new Method[sections[0].size+sections[0].baseAddress - 0x400000];
     memset(m_methods, 0, sizeof(Method)*(sections[0].size+sections[0].baseAddress - 0x400000));*/
-    memset(&m_cpu, 0, sizeof(m_cpu));
     dsetup::s_dSetupRegistry->registerSymbols(this);
     ddraw::s_dDrawRegistry->registerSymbols(this);
     glide2x::s_glide2xRegistry->registerSymbols(this);
     Event::init();
     strcpy(&getMemory<char>(m_appName->getBlockStart()), appName);
-    strcat(&getMemory<char>(m_appName->getBlockStart()), " -modes");
     getMemory<char>(m_env->getBlockStart()) = 0;
     WCHAR* wchar = &getMemory<WCHAR>(m_appNameW->getBlockStart());
     *wchar++ = 0xfffe;
@@ -98,7 +95,7 @@ WinApplication::~WinApplication()
     delete m_resourceContext;
     delete m_executionContext;
     /*delete[] m_methods;*/
-    NFS2_ASSERT(SDL_AtomicGet(&s_resourceCount) == 0);
+    NFS2_ASSERT(SDL_GetAtomicInt(&s_resourceCount) == 0);
 }
 
 void WinApplication::addRegistryKey(x86::reg32 root, const char* keyname, const char* valuename, RegistryValue* value)

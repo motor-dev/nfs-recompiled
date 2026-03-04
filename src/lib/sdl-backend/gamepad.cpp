@@ -1,6 +1,6 @@
 #include <lib/gamepad.h>
-#include <SDL_events.h>
-#include <SDL_log.h>
+#include <SDL3/SDL.h>
+#include <cstring>
 
 
 namespace win32
@@ -14,14 +14,14 @@ static Gamepad* s_gp1;
 void Input::poll()
 {
     s_kbPoll = 3;
-    SDL_JoystickUpdate();
+    SDL_UpdateJoysticks();
 }
 
 void Gamepad::updateKeys()
 {
     if (s_gp1)
     {
-        SDL_JoystickUpdate();
+        SDL_UpdateJoysticks();
         if (s_kbPoll == 0)
         {
             GamepadState state = s_gp1->getState();
@@ -30,7 +30,7 @@ void Gamepad::updateKeys()
             {
                 if (state.axes[axis] != s_state.axes[axis])
                 {
-                    event.type = SDL_JOYAXISMOTION;
+                    event.type = SDL_EVENT_JOYSTICK_AXIS_MOTION;
                     event.jaxis.which = 0;
                     event.jaxis.axis = axis;
                     event.jaxis.value = state.axes[axis];
@@ -42,10 +42,10 @@ void Gamepad::updateKeys()
                 x86::reg64 bMask = 1ll << button;
                 if ((s_state.buttons & bMask) != (state.buttons & bMask))
                 {
-                    event.type = state.buttons & bMask ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
+                    event.type = state.buttons & bMask ? SDL_EVENT_JOYSTICK_BUTTON_DOWN : SDL_EVENT_JOYSTICK_BUTTON_UP;
                     event.jbutton.which = 0;
                     event.jbutton.button = button;
-                    event.jbutton.state = state.buttons & bMask ? SDL_PRESSED : SDL_RELEASED;
+                    event.jbutton.down = !!(state.buttons & bMask);
                     SDL_PushEvent(&event);
                 }
             }
@@ -53,17 +53,16 @@ void Gamepad::updateKeys()
         }
         else
         {
-            SDL_Log("Ignoring event poll");
             SDL_Event event;
             for (x86::reg32 button = 0; button < 64; ++button)
             {
                 x86::reg64 bMask = 1ll << button;
                 if ((s_state.buttons & bMask))
                 {
-                    event.type = SDL_JOYBUTTONUP;
+                    event.type = SDL_EVENT_JOYSTICK_BUTTON_UP;
                     event.jbutton.which = 0;
                     event.jbutton.button = button;
-                    event.jbutton.state = SDL_RELEASED;
+                    event.jbutton.down = false;
                     SDL_PushEvent(&event);
                 }
             }
@@ -84,9 +83,14 @@ x86::reg32 Input::getAxesCount() const
 }
 
 Gamepad::Gamepad(x86::reg32 gamepadIndex)
-    :   m_joystick(SDL_JoystickOpen(gamepadIndex))
+    :   m_joystick(nullptr)
 {
-    SDL_JoystickEventState(0);
+    int count = 0;
+    SDL_JoystickID *ids = SDL_GetJoysticks(&count);
+    if (ids && (int)gamepadIndex < count)
+        m_joystick = SDL_OpenJoystick(ids[gamepadIndex]);
+    SDL_free(ids);
+    SDL_SetJoystickEventsEnabled(false);
     if (!s_gp1)
         s_gp1 = this;
 }
@@ -95,22 +99,25 @@ Gamepad::~Gamepad()
 {
     if (s_gp1)
         s_gp1 = nullptr;
-    SDL_JoystickClose(m_joystick);
+    SDL_CloseJoystick(m_joystick);
 }
 
 x86::reg32 Gamepad::getCount()
 {
-    return SDL_NumJoysticks();
+    int count = 0;
+    SDL_JoystickID *ids = SDL_GetJoysticks(&count);
+    SDL_free(ids);
+    return (x86::reg32)count;
 }
 
 x86::reg32 Gamepad::getButtonCount() const
 {
-    return SDL_JoystickNumButtons(m_joystick);
+    return SDL_GetNumJoystickButtons(m_joystick);
 }
 
 x86::reg32 Gamepad::getAxesCount() const
 {
-    return SDL_JoystickNumAxes(m_joystick);
+    return SDL_GetNumJoystickAxes(m_joystick);
 }
 
 GamepadState Gamepad::getState() const
@@ -119,11 +126,11 @@ GamepadState Gamepad::getState() const
     memset(&result, 0, sizeof(result));
     for (x86::reg32 button = 0; button < getButtonCount(); ++button)
     {
-        result.buttons |= (SDL_JoystickGetButton(m_joystick, button) ? 1 : 0) << button;
+        result.buttons |= (SDL_GetJoystickButton(m_joystick, button) ? 1 : 0) << button;
     }
     for (x86::reg32 axis = 0; axis < getAxesCount(); ++axis)
     {
-        result.axes[axis] = SDL_JoystickGetAxis(m_joystick, axis);
+        result.axes[axis] = SDL_GetJoystickAxis(m_joystick, axis);
     }
     return result;
 }

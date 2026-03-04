@@ -1,5 +1,5 @@
 #include <lib/memmap.h>
-#include <SDL_mutex.h>
+#include <SDL3/SDL.h>
 #include <vector>
 #ifdef _WIN32
 # include <windows.h>

@@ -1,4 +1,4 @@
-#include <SDL_main.h>
+#include <SDL3/SDL_main.h>
 #include <lib/file.h>
 #include <lib/registry.h>
 #include <nfs3hp.h>
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
         win32::File::setDataDirectory(exeDir.c_str());
         win32::File::setCdDirectory(exeDir.c_str());
     }
-    SDL_Init(SDL_INIT_TIMER|SDL_INIT_EVENTS|SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
+    SDL_Init(SDL_INIT_EVENTS|SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
     {
         nfs3hp::Application app("nfs3.exe");
         app.addRegistryKey(win32::HKEY_LOCAL_MACHINE, "SOFTWARE\\Electronic Arts\\Need For Speed III", "3D Device Description", new win32::RegistryValue("3Dfx Voodoo 2"));

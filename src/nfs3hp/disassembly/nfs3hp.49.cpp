@@ -14757,7 +14757,7 @@ L_0x00523361:
     // 00523363  d9fc                   +frndint 
     cpu.fpu.st(0) = cpu.fpu.rndint();
     // 00523365  d8da                   +fcomp st(2)
-    cpu.fpu.compare(cpu.fpu.st(0), cpu.fpu.st(2));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(cpu.fpu.st(2)));
     cpu.fpu.pop();
     // 00523367  9b                     -wait 
     /*nothing*/;

@@ -2,7 +2,7 @@
 #define LIB_AUDIO_H_
 #include <lib/winapp.h>
 #include <lib/memmap.h>
-#include <SDL_audio.h>
+#include <SDL3/SDL.h>
 
 
 namespace win32
@@ -18,13 +18,13 @@ public:
 
     void play(AudioBuffer* buffer);
     void stop(AudioBuffer* buffer);
+    SDL_AudioStream* stream() const { return m_stream; }
 
 private:
-    static void audioCallback22050(void *userdata, x86::reg8* stream, int len);
-    static void audioCallback44100(void *userdata, x86::reg8* stream, int len);
+    static void audioCallback22050(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 
 private:
-    SDL_AudioDeviceID           m_id;
+    SDL_AudioStream*            m_stream;
     std::vector<AudioBuffer*>   m_playingBuffers;
 };
 

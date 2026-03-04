@@ -4,8 +4,6 @@
 #include <lib/winapp.h>
 #include <string>
 
-struct SDL_mutex;
-
 namespace win32
 {
 
@@ -21,7 +19,7 @@ public:
     x86::reg32 getResourceIndex() const { return m_resourceIndex; }
 
 private:
-    SDL_mutex*  m_mutex;
+    SDL_Mutex*  m_mutex;
     std::string m_name;
     x86::reg32  m_owner;
     x86::reg32  m_count;

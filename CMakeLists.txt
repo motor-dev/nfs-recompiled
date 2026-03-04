@@ -31,34 +31,34 @@ else()
     add_compile_options(-Wall -Wextra -Werror -Wstrict-aliasing=2)
 endif()
 
-# When building for Windows we have a local copy of SDL2 under the
-# `sdl2` subdirectory.  Point CMake at it so find_package() will
+# When building for Windows we have a local copy of SDL3 under the
+# `sdl3` subdirectory.  Point CMake at it so find_package() will
 # locate the bundled config file automatically.
 if(TARGET_WINDOWS)
-    message(STATUS "Windows target detected – adding ${CMAKE_SOURCE_DIR}/sdl2/cmake to CMAKE_PREFIX_PATH for SDL2")
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/sdl2/cmake")
-    set(SDL2_DIR "${CMAKE_SOURCE_DIR}/sdl2/cmake" CACHE PATH "SDL2 CMake directory")
+    message(STATUS "Windows target detected – adding ${CMAKE_SOURCE_DIR}/sdl3/cmake to CMAKE_PREFIX_PATH for SDL3")
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/sdl3/cmake")
+    set(SDL3_DIR "${CMAKE_SOURCE_DIR}/sdl3/cmake" CACHE PATH "SDL3 CMake directory")
 endif()
 
-find_package(SDL2 REQUIRED)
+find_package(SDL3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 # prefer modern imported targets if available
-if(TARGET SDL2::SDL2)
-    set(SDL2_LIB_TARGET SDL2::SDL2)
+if(TARGET SDL3::SDL3)
+    set(SDL3_LIB_TARGET SDL3::SDL3)
 else()
-    include_directories(${SDL2_INCLUDE_DIRS})
-    set(SDL2_LIB_TARGET ${SDL2_LIBRARIES})
+    include_directories(${SDL3_INCLUDE_DIRS})
+    set(SDL3_LIB_TARGET ${SDL3_LIBRARIES})
 endif()
 
-# SDL2main provides the WinMain→main entry-point shim required on Windows.
-# The modern config exposes it as a separate target; the legacy FindSDL2.cmake
-# already folds it into SDL2_LIBRARIES, so we only add it on top for the
+# SDL3main provides the WinMain→main entry-point shim required on Windows.
+# The modern config exposes it as a separate target; the legacy FindSDL3.cmake
+# already folds it into SDL3_LIBRARIES, so we only add it on top for the
 # imported-target path.
-if(TARGET SDL2::SDL2main)
-    set(SDL2_MAIN_TARGET SDL2::SDL2main)
+if(TARGET SDL3::SDL3main)
+    set(SDL3_MAIN_TARGET SDL3::SDL3main)
 else()
-    set(SDL2_MAIN_TARGET "")
+    set(SDL3_MAIN_TARGET "")
 endif()
 
 file(GLOB NFS2SE_DISASM_SOURCES
@@ -107,7 +107,7 @@ endif()
 add_library(nfs_core STATIC ${LIB_CPP_SOURCES})
 target_include_directories(nfs_core PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(nfs_core PRIVATE ${SDL2_MAIN_TARGET} ${SDL2_LIB_TARGET} OpenGL::GL)
+target_link_libraries(nfs_core PRIVATE ${SDL3_MAIN_TARGET} ${SDL3_LIB_TARGET} OpenGL::GL)
 
 # helper function for adding the game executables
 function(add_game_exe name)
@@ -137,7 +137,7 @@ function(add_game_exe name)
         ${game_src_dir}
         ${CMAKE_SOURCE_DIR}/src/${name}/disassembly
         ${CMAKE_SOURCE_DIR}/include)
-    target_link_libraries(${name} PRIVATE ${SDL2_MAIN_TARGET} nfs_core ${SDL2_LIB_TARGET} OpenGL::GL)
+    target_link_libraries(${name} PRIVATE ${SDL3_MAIN_TARGET} nfs_core ${SDL3_LIB_TARGET} OpenGL::GL)
     if(WITH_PEDANTIC_FPU)
         target_compile_definitions(${name} PRIVATE WITH_PEDANTIC_FPU)
     endif()

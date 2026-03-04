@@ -5,7 +5,7 @@
 #include <cstring>
 #include <cmath>
 
-#define NFS2SE_X87_DEBUG 0
+//#define NFS2SE_X87_DEBUG 1
 
 namespace x86
 {
@@ -28,11 +28,12 @@ namespace x86
 
         inline IEEEf80();
         inline IEEEf80(IEEEf80Data data) : data(data) {};
-#ifndef WITH_PEDANTIC_FPU
         inline IEEEf80(double value);
-#else
+
+#ifdef WITH_PEDANTIC_FPU
         inline void operator=(const Float &value);
 #endif
+
         inline operator double() const;
         inline void operator=(double value);
     };
@@ -70,12 +71,10 @@ namespace x86
     {
     }
 
-#ifndef WITH_PEDANTIC_FPU
     inline IEEEf80::IEEEf80(double value)
     {
         convert64x80(&value, &data);
     }
-#endif
 
     IEEEf80::operator double() const
     {
@@ -398,11 +397,10 @@ namespace x86
             count = 0;
         }
 
-        inline void compare(const Float &val1, const Float &val2)
+        inline void compare(const Float& val1, const Float& val2)
         {
-
 #ifdef WITH_PEDANTIC_FPU
-            x86::reg32 r = cmp80(&val1.f80value, &val2.f80value) & 0x4700;
+            x86::reg32 r = cmp80(&val1.f80value.data, &val2.f80value.data) & 0x4700;
             status.word &= ~0x4700;
             status.word |= r;
 #else
@@ -437,11 +435,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = log280(&result.f80value);
+            x86::reg32 r = log280(&result.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -453,11 +451,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = sin80(&result.f80value);
+            x86::reg32 r = sin80(&result.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -469,11 +467,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = cos80(&result.f80value);
+            x86::reg32 r = cos80(&result.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -501,7 +499,7 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = abs80(&result.f80value);
+            x86::reg32 r = abs80(&result.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
@@ -517,7 +515,7 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = sqrt80(&result.f80value);
+            x86::reg32 r = sqrt80(&result.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
@@ -582,11 +580,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = f2xm180(&result.f80value);
+            x86::reg32 r = f2xm180(&result.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -598,16 +596,16 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = st(0);
-            round80(&result.f80value, control.rc);
+            round80(&result.f80value.data, control.rc);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
             switch (control.rc)
             {
             case 0:
-                return Float(round(double(st(0))));
+                return Float(nearbyint(double(st(0))));
             case 1:
                 return Float(floor(double(st(0))));
             case 2:

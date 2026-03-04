@@ -20,7 +20,7 @@
 # define O_BINARY 0
 #endif
 #include <algorithm>
-#include <SDL_log.h>
+#include <SDL3/SDL.h>
 
 
 namespace win32
@@ -139,7 +139,7 @@ FileEnumerator::FileEnumerator(const char* filename)
     ,   m_index(-1)
 {
     std::transform(m_pattern.begin(), m_pattern.end(), m_pattern.begin(), ::tolower);
-    SDL_Log("Enumerate %s", m_pattern.c_str());
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "Enumerate %s", m_pattern.c_str());
 #ifdef _WIN32
     NFS2_ASSERT(sizeof(::WIN32_FIND_DATAA) == sizeof(WIN32_FIND_DATAA));
     ::WIN32_FIND_DATAA findData;
@@ -148,13 +148,13 @@ FileEnumerator::FileEnumerator(const char* filename)
     if (h != ::HANDLE(-1))
     {
         memcpy(&result, &findData, sizeof(result));
-        SDL_Log("  ->  %s", result.cFileName);
+        SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "  ->  %s", result.cFileName);
         m_files.push_back(result);
     }
     while (::FindNextFileA(h, &findData))
     {
         memcpy(&result, &findData, sizeof(result));
-        SDL_Log("  ->  %s", result.cFileName);
+        SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "  ->  %s", result.cFileName);
         m_files.push_back(result);
     }
     ::FindClose(h);
@@ -234,7 +234,7 @@ File::File(const File& other)
     :   m_file(_open(other.m_filename.c_str(), O_RDONLY|O_BINARY, 0664))
     ,   m_filename(other.m_filename)
 {
-    SDL_Log("opening file %s for Map", m_filename.c_str());
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "opening file %s for Map", m_filename.c_str());
 }
 
 File::File(const char* path, x86::reg32 mode, x86::reg32 flags, x86::reg32 creationFlags)
@@ -285,11 +285,11 @@ File::File(const char* path, x86::reg32 mode, x86::reg32 flags, x86::reg32 creat
     m_file = _open(m_filename.c_str(), openFlags, 0664);
     if (m_file == -1)
     {
-        SDL_Log("unable to open file %s", m_filename.c_str());
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "unable to open file %s", m_filename.c_str());
     }
     else
     {
-        SDL_Log("opening file %s", m_filename.c_str());
+        SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "opening file %s", m_filename.c_str());
     }
 }
 
@@ -298,7 +298,7 @@ File::~File()
     if (m_file != -1)
     {
         _close(m_file);
-        SDL_Log("closing file %s", m_filename.c_str());
+        SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "closing file %s", m_filename.c_str());
     }
 }
 
@@ -338,7 +338,7 @@ x86::reg32 File::write(const void* buffer, x86::reg32 max, x86::reg32* totalWrit
 
 x86::reg32 File::truncate()
 {
-    SDL_Log("Truncating file %s", m_filename.c_str());
+    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "Truncating file %s", m_filename.c_str());
     return _chsize(m_file, _lseek(m_file, 0, 1)) == 0;
 }
 
@@ -384,12 +384,12 @@ x86::reg32 File::remove(const char *filename)
     f = resolvePathCaseInsensitive(f);
     if (_unlink(f.c_str()) != 0)
     {
-        SDL_Log("unable to delete file %s", filename);
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "unable to delete file %s", filename);
         return 0;
     }
     else
     {
-        SDL_Log("Deleting file %s", filename);
+        SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "Deleting file %s", filename);
         return 1;
     }
 }

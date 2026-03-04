@@ -4200,7 +4200,7 @@ void Application::sub_52b523(WinApplication* app, x86::CPU& cpu)
     // 0052b539  d9ee                   +fldz 
     cpu.fpu.push(0.0);
     // 0052b53b  dc5d10                 +fcomp qword ptr [ebp + 0x10]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(cpu.ebp + x86::reg32(16) /* 0x10 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(cpu.ebp + x86::reg32(16) /* 0x10 */)));
     cpu.fpu.pop();
     // 0052b53e  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;
@@ -4244,7 +4244,7 @@ L_0x0052b564:
     // 0052b564  d9ee                   +fldz 
     cpu.fpu.push(0.0);
     // 0052b566  dc5d10                 +fcomp qword ptr [ebp + 0x10]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(cpu.ebp + x86::reg32(16) /* 0x10 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(cpu.ebp + x86::reg32(16) /* 0x10 */)));
     cpu.fpu.pop();
     // 0052b569  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;
@@ -4268,7 +4268,7 @@ L_0x0052b578:
     // 0052b578  d9ee                   +fldz 
     cpu.fpu.push(0.0);
     // 0052b57a  dc5d08                 +fcomp qword ptr [ebp + 8]
-    cpu.fpu.compare(cpu.fpu.st(0), app->getMemory<double>(cpu.ebp + x86::reg32(8) /* 0x8 */));
+    cpu.fpu.compare(cpu.fpu.st(0), x86::Float(app->getMemory<double>(cpu.ebp + x86::reg32(8) /* 0x8 */)));
     cpu.fpu.pop();
     // 0052b57d  dfe0                   -fnstsw ax
     cpu.ax = cpu.fpu.status.word;

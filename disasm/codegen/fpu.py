@@ -89,7 +89,7 @@ def cg_fsubp(instruction, function_bounds, function_names, *argument):
 
 def cg_fsubr(instruction, function_bounds, function_names, *argument):
     if len(argument) == 1:
-        return ['cpu.fpu.st(0) = %s - cpu.fpu.st(0);' % arguments.get_float(instruction, *argument)]
+        return ['cpu.fpu.st(0) = x86::Float(%s) - cpu.fpu.st(0);' % arguments.get_float(instruction, *argument)]
     elif len(argument) == 2:
         return ['%s = x86::Float(%s) - x86::Float(%s);' % (arguments.get_float(instruction, argument[0]),
                                    arguments.get_float(instruction, argument[1]),
@@ -204,7 +204,7 @@ def cg_ftst(instruction, function_bounds, function_names):
 
 
 def cg_fcom(instruction, function_bounds, function_names, operand):
-    return ['cpu.fpu.compare(cpu.fpu.st(0), %s);' % arguments.get_float(instruction, operand)]
+    return ['cpu.fpu.compare(cpu.fpu.st(0), x86::Float(%s));' % arguments.get_float(instruction, operand)]
 
 
 def cg_fcomp(instruction, function_bounds, function_names, operand):
