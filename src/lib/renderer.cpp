@@ -91,7 +91,31 @@ void Renderer::present()
     glBindTexture(GL_TEXTURE_2D, m_texture);
     int w, h;
     SDL_GetWindowSizeInPixels(m_window->m_window, &w, &h);
+
+    float gameAspect = float(m_width) / float(m_height);
+    float windowAspect = float(w) / float(h);
+    int vpX, vpY, vpW, vpH;
+    if (windowAspect > gameAspect)
+    {
+        vpH = h;
+        vpW = int(h * gameAspect + 0.5f);
+        vpX = (w - vpW) / 2;
+        vpY = 0;
+    }
+    else
+    {
+        vpW = w;
+        vpH = int(w / gameAspect + 0.5f);
+        vpX = 0;
+        vpY = (h - vpH) / 2;
+    }
+
     glViewport(0, 0, w, h);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Render the game texture into the aspect-ratio-correct viewport
+    glViewport(vpX, vpY, vpW, vpH);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, m_width, m_height, 0, -1.0f, 1.0f);
@@ -165,7 +189,10 @@ void Renderer::swap()
     SDL_GL_SetSwapInterval(1);
     m_currentBuffer = 1 - m_currentBuffer;
     for (int i = 0; i < (mode ? (int)(mode->refresh_rate / 30) : 2); ++i)
+    {
+        // We enabled vsync and now render until we have a refresh rate of 30
         update();
+    }
     clearCurrent();
 }
 
