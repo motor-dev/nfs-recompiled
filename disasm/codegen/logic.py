@@ -1,10 +1,16 @@
 from . import arguments
+from capstone import x86
 
 
 def cg_bswap(instruction, function_bounds, function_names, parameter):
     assert parameter.size == 4
+    if parameter.type == x86.X86_OP_MEM:
+        tmp = '    x86::reg32 tmp = %s;' % arguments.get_value(instruction, parameter)
+    else:
+        tmp = '    x86::reg32& tmp = %s;' % arguments.get_value(instruction, parameter)
+
     return ['{',
-            '    x86::reg32& tmp = %s;' % arguments.get_value(instruction, parameter),
+            tmp,
             '    tmp = ( tmp               << 16) ^  (tmp >> 16);',
             '    tmp = ((tmp & 0x00ff00ff) <<  8) ^ ((tmp >>  8) & 0x00ff00ff);',
             '}'

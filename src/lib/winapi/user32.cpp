@@ -2,6 +2,7 @@
 #include <x86.h>
 #include <lib/window.h>
 #include <cctype>
+#include <SDL_messagebox.h>
 
 namespace win32 { namespace user32
 {
@@ -48,7 +49,7 @@ x86::reg32 CharUpperA(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(cpu);
     for (char* c = lpsz; *c; ++c)
         *c = char(toupper(*c));
-    return *app->getMemory<x86::reg32>(cpu.esp + 4);
+    return app->getMemory<x86::reg32>(cpu.esp + 4);
 }
 
 DWORD CharUpperBuffA(WinApplication* app, x86::CPU& cpu,
@@ -210,11 +211,11 @@ LRESULT DispatchMessageA(WinApplication* app, x86::CPU& cpu,
 {
     x86::reg32 handler = win32::Window::getMessageHandler();
     cpu.esp -= 20;
-    *app->getMemory<x86::reg32>(cpu.esp + 16) = lpMsg->lParam;
-    *app->getMemory<x86::reg32>(cpu.esp + 12) = lpMsg->wParam;
-    *app->getMemory<x86::reg32>(cpu.esp + 8) = lpMsg->message;
-    *app->getMemory<x86::reg32>(cpu.esp + 4) = lpMsg->hWindow;
-    *app->getMemory<x86::reg32>(cpu.esp + 0) = handler;
+    app->getMemory<x86::reg32>(cpu.esp + 16) = lpMsg->lParam;
+    app->getMemory<x86::reg32>(cpu.esp + 12) = lpMsg->wParam;
+    app->getMemory<x86::reg32>(cpu.esp + 8) = lpMsg->message;
+    app->getMemory<x86::reg32>(cpu.esp + 4) = lpMsg->hWindow;
+    app->getMemory<x86::reg32>(cpu.esp + 0) = handler;
     app->dynamic_call(handler, cpu);
     return x86::sreg32(cpu.eax);
 }
@@ -372,9 +373,19 @@ int MessageBoxA(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(app);
     NFS2_USE(cpu);
     NFS2_USE(hWnd);
-    NFS2_USE(lpText);
-    NFS2_USE(lpCaption);
-    NFS2_USE(uType);
+    if (uType & 0x0001)
+    {
+        SDL_Log("[error] %s", lpCaption);
+    }
+    else if (uType & 0x0002)
+    {
+        SDL_Log("[warning] %s", lpCaption);
+    }
+    else
+    {
+        SDL_Log("[info] %s", lpCaption);
+    }
+    SDL_Log("%s", lpText);
     return 0;
 }
 

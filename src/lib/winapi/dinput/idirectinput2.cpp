@@ -56,7 +56,7 @@ HRESULT IDirectInput2::CreateDevice(WinApplication* app, x86::CPU& cpu,
     }
     app->allocateResource(input);
     *lplpDirectInputDevice = Packed<IDirectInputDevice>(com::ComAlloc(app));
-    new (app->getMemory<IDirectInputDevice>(*lplpDirectInputDevice)) IDirectInputDevice(input);
+    new (&app->getMemory<IDirectInputDevice>(*lplpDirectInputDevice)) IDirectInputDevice(input);
     return 0;
 }
 
@@ -70,7 +70,7 @@ HRESULT IDirectInput2::EnumDevices(WinApplication* app, x86::CPU& cpu,
     if (dwDevType == 4)
     {
         MemMap mem(1024);
-        DIDEVICEINSTANCE* device = app->getMemory<DIDEVICEINSTANCE>(mem.getBlockStart());
+        DIDEVICEINSTANCE* device = &app->getMemory<DIDEVICEINSTANCE>(mem.getBlockStart());
         device->dwSize = sizeof(DIDEVICEINSTANCE);
         for (x86::reg16 deviceIndex = 0; deviceIndex < Gamepad::getCount(); ++deviceIndex)
         {
@@ -85,9 +85,9 @@ HRESULT IDirectInput2::EnumDevices(WinApplication* app, x86::CPU& cpu,
             device->wUsagePage = 0;
             device->wUsage = 0;
             cpu.esp -= 12;
-            *app->getMemory<x86::reg32>(cpu.esp + 0) = lpCallback;
-            *app->getMemory<x86::reg32>(cpu.esp + 4) = mem.getBlockStart();
-            *app->getMemory<x86::reg32>(cpu.esp + 8) = pvRef;
+            app->getMemory<x86::reg32>(cpu.esp + 0) = lpCallback;
+            app->getMemory<x86::reg32>(cpu.esp + 4) = mem.getBlockStart();
+            app->getMemory<x86::reg32>(cpu.esp + 8) = pvRef;
             app->dynamic_call(lpCallback, cpu);
             if (!cpu.eax)
                 break;

@@ -40,10 +40,12 @@ static std::string moveToRoot(const std::string& path)
         else
             return s_cdDirectory + std::string(path.begin() + 2, path.end());
     }
+#ifndef _WIN32
     else if (path == "nul")
     {
         return "/dev/null";
     }
+#endif
     else
     {
         /* Relative path - map to local install directory */
@@ -241,10 +243,6 @@ File::File(const char* path, x86::reg32 mode, x86::reg32 flags, x86::reg32 creat
 {
     NFS2_USE(flags);
     std::transform(m_filename.begin(), m_filename.end(), m_filename.begin(), ::tolower);
-    if (m_filename == "nul")
-    {
-        m_filename = "/dev/null";
-    }
     //NFS2_ASSERT((flags & FILE_FLAG_OVERLAPPED) == 0);
     for (std::string::iterator it = m_filename.begin(); it != m_filename.end(); ++it)
         if (*it == '\\') *it = '/';

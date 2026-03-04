@@ -59,14 +59,16 @@ WinApplication::WinApplication(const char* appName, x86::reg32 baseAddress, cons
     ddraw::s_dDrawRegistry->registerSymbols(this);
     glide2x::s_glide2xRegistry->registerSymbols(this);
     Event::init();
-    strcpy(getMemory<char>(m_appName->getBlockStart()), appName);
-    *getMemory<char>(m_env->getBlockStart()) = 0;
-    WCHAR* wchar = getMemory<WCHAR>(m_appNameW->getBlockStart());
+    strcpy(&getMemory<char>(m_appName->getBlockStart()), appName);
+    strcat(&getMemory<char>(m_appName->getBlockStart()), " -modes");
+    getMemory<char>(m_env->getBlockStart()) = 0;
+    WCHAR* wchar = &getMemory<WCHAR>(m_appNameW->getBlockStart());
     *wchar++ = 0xfffe;
     for (const char* appNameW = appName; *appNameW; ++wchar, ++appNameW)
     {
         *wchar = WCHAR(*appNameW);
     }
+    *wchar = 0;
     allocateResourceFixed(new RegistryKey(), HKEY_CLASSES_ROOT);
     allocateResourceFixed(new RegistryKey(), HKEY_CURRENT_USER);
     allocateResourceFixed(new RegistryKey(), HKEY_LOCAL_MACHINE);
@@ -191,11 +193,11 @@ int WinApplication::runThread(x86::CPU& cpu, x86::reg32 entryPoint, x86::reg32 p
         win32::MemMap threadStorage(4096);
         win32::MemMap threadStack(1024 * 1024);
         cpu.init(threadStorage.getBlockStart(), entryPoint);
-        *getMemory<Mutex*>(cpu.efs + 8) = threadLock ? m_executionContext : nullptr;
+        getMemory<Mutex*>(cpu.efs + 8) = threadLock ? m_executionContext : nullptr;
         LockContext ctx(*this, cpu);
         cpu.esp = threadStack.getBlockStart() + threadStack.getBlockSize() - 8;
-        *getMemory<x86::reg32>(cpu.esp + 4) = parameter;
-        *getMemory<x86::reg32>(cpu.esp) = cpu.ip;
+        getMemory<x86::reg32>(cpu.esp + 4) = parameter;
+        getMemory<x86::reg32>(cpu.esp) = cpu.ip;
         dynamic_call(entryPoint, cpu);
         return int(cpu.eax);
     }
@@ -207,7 +209,7 @@ int WinApplication::runThread(x86::CPU& cpu, x86::reg32 entryPoint, x86::reg32 p
 
 void WinApplication::lockContext(const x86::CPU& cpu)
 {
-    Mutex* executionContext = *getMemory<Mutex*>(cpu.efs + 8);
+    Mutex* executionContext = getMemory<Mutex*>(cpu.efs + 8);
     NFS2_ASSERT(executionContext);
     if (executionContext)
     {
@@ -217,7 +219,7 @@ void WinApplication::lockContext(const x86::CPU& cpu)
 
 void WinApplication::unlockContext(const x86::CPU& cpu)
 {
-    Mutex* executionContext = *getMemory<Mutex*>(cpu.efs + 8);
+    Mutex* executionContext = getMemory<Mutex*>(cpu.efs + 8);
     NFS2_ASSERT(executionContext);
     if (executionContext)
     {
@@ -227,11 +229,11 @@ void WinApplication::unlockContext(const x86::CPU& cpu)
 
 void WinApplication::unmarkContext(const x86::CPU& cpu)
 {
-    Mutex* executionContext = *getMemory<Mutex*>(cpu.efs + 8);
+    Mutex* executionContext = getMemory<Mutex*>(cpu.efs + 8);
     if (executionContext)
     {
         executionContext->unlock();
-        *getMemory<Mutex*>(cpu.efs + 8) = nullptr;
+        getMemory<Mutex*>(cpu.efs + 8) = nullptr;
     }
     else
     {

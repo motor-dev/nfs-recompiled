@@ -71,7 +71,7 @@ AudioBuffer::AudioBuffer(AudioDevice* device, WinApplication* app, x86::reg32 bu
     ,   m_bufferSize(bufferSize ? bufferSize : s_sampleSize  * sizeof(x86::sreg16))
     ,   m_memmap(new MemMap(m_bufferSize))
     ,   m_bufferMap(new MemMap(m_bufferSize))
-    ,   m_buffer(app->getMemory<x86::sreg16>(m_memmap->getBlockStart()))
+    ,   m_buffer(&app->getMemory<x86::sreg16>(m_memmap->getBlockStart()))
     ,   m_playStart(0)
     ,   m_playStop(0)
     ,   m_primary(bufferSize == 0)

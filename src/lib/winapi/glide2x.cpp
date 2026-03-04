@@ -931,7 +931,6 @@ static x86::reg32 grTexCalcMemRequired(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(cpu);
     NFS2_USE(fmt);
     NFS2_ASSERT(aspect == GR_ASPECT_1x1);
-    SDL_Log("grTexCalcMemRequired called with lodmin=%d, lodmax=%d", lodmin, lodmax);
     return s_glideRenderer->getTextureMemSize(256 >> lodmin, 256 >> lodmax, TF_RGB_565);
 }
 
@@ -944,17 +943,17 @@ static void grTexDownloadMipMap(WinApplication* app, x86::CPU& cpu, GrChipID_t t
     app->unlockContext(cpu);
     if (info->format == GR_TEXFMT_RGB_565)
     {
-        s_glideRenderer->setTextureData(tmu, startAddress, app->getMemory<const void>(info ->data),
+        s_glideRenderer->setTextureData(tmu, startAddress, &app->getMemory<const void>(info ->data),
                                         info->largeLod, info->smallLod, TF_RGB_565);
     }
     else if (info->format == GR_TEXFMT_ARGB_1555)
     {
-        s_glideRenderer->setTextureData(tmu, startAddress, app->getMemory<const void>(info ->data),
+        s_glideRenderer->setTextureData(tmu, startAddress, &app->getMemory<const void>(info ->data),
                                         info->largeLod, info->smallLod, TF_ARGB_1555);
     }
     else if (info->format == GR_TEXFMT_ARGB_4444)
     {
-        s_glideRenderer->setTextureData(tmu, startAddress, app->getMemory<const void>(info ->data),
+        s_glideRenderer->setTextureData(tmu, startAddress, &app->getMemory<const void>(info ->data),
                                         info->largeLod, info->smallLod, TF_ARGB_4444);
     }
     else

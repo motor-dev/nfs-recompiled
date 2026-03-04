@@ -1,5 +1,5 @@
 from . import arguments
-
+from capstone import x86
 
 def cg_movsx(instruction, function_bounds, function_names, destination, operand):
     return ['%s = x86::reg%d(static_cast<x86::sreg%d>(%s));' % (arguments.get_value(instruction, destination),
@@ -24,8 +24,12 @@ def cg_inc(instruction, function_bounds, function_names, destination):
     if not instruction.precious_flags:
         return ['(%s)++;' % arguments.get_value(instruction, destination)]
     else:
+        if destination.type == x86.X86_OP_MEM:
+            tmp = '    auto tmp = %s;' % (arguments.get_value(instruction, destination))
+        else:
+            tmp = '    x86::reg%d& tmp = %s;' % (destination.size * 8, arguments.get_value(instruction, destination))
         return ['{',
-                '    x86::reg%d& tmp = %s;' % (destination.size * 8, arguments.get_value(instruction, destination)),
+                tmp,
                 '    cpu.flags.of = ~(1 & (tmp >> %d));' % (destination.size * 8 - 1),
                 '    tmp++;',
                 '    cpu.flags.of &= 1 & (tmp >> %d);' % (destination.size * 8 - 1),
@@ -134,8 +138,12 @@ def cg_add(instruction, function_bounds, function_names, destination, operand):
                                              destination.size * 8,
                                              arguments.sign_extend(instruction, operand, destination.size))]
     else:
+        if destination.type == x86.X86_OP_MEM:
+            tmp = '    auto tmp1 = %s;' % (arguments.get_value(instruction, destination))
+        else:
+            tmp = '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination))
         return ['{',
-                '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination)),
+                tmp,
                 '    x86::reg%d tmp2 = x86::reg%d(%s);' % (destination.size * 8,
                                                            destination.size * 8,
                                                            arguments.sign_extend(instruction, operand, destination.size)),
@@ -155,8 +163,12 @@ def cg_adc(instruction, function_bounds, function_names, destination, operand):
                                                             destination.size * 8,
                                                             arguments.sign_extend(instruction, operand, destination.size))]
     else:
+        if destination.type == x86.X86_OP_MEM:
+            tmp = '    auto tmp1 = %s;' % (arguments.get_value(instruction, destination))
+        else:
+            tmp = '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination))
         return ['{',
-                '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination)),
+                tmp,
                 '    x86::reg%d tmp2 = x86::reg%d(%s) + cpu.flags.cf;' % (destination.size * 8,
                                                                           destination.size * 8,
                                                                           arguments.sign_extend(instruction, operand, destination.size)),
@@ -174,8 +186,12 @@ def cg_dec(instruction, function_bounds, function_names, destination):
     if not instruction.precious_flags:
         return ['(%s)--;' % arguments.get_value(instruction, destination)]
     else:
+        if destination.type == x86.X86_OP_MEM:
+            tmp = '    auto tmp = %s;' % (arguments.get_value(instruction, destination))
+        else:
+            tmp = '    x86::reg%d& tmp = %s;' % (destination.size * 8, arguments.get_value(instruction, destination))
         return ['{',
-                '    x86::reg%d& tmp = %s;' % (destination.size * 8, arguments.get_value(instruction, destination)),
+                tmp,
                 '    cpu.flags.of = 1 & (tmp >> %d);' % (destination.size * 8 - 1),
                 '    tmp--;',
                 '    cpu.flags.of &= ~(1 & (tmp >> %d));' % (destination.size * 8 - 1),
@@ -189,8 +205,12 @@ def cg_sub(instruction, function_bounds, function_names, destination, operand):
                                              destination.size * 8,
                                              arguments.sign_extend(instruction, operand, destination.size))]
     else:
+        if destination.type == x86.X86_OP_MEM:
+            tmp = '    auto tmp1 = %s;' % (arguments.get_value(instruction, destination))
+        else:
+            tmp = '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination))
         return ['{',
-                '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination)),
+                tmp,
                 '    x86::reg%d tmp2 = x86::reg%d(%s);' % (destination.size * 8, destination.size * 8, arguments.sign_extend(instruction, operand, destination.size)),
                 '    x86::reg%d result = tmp1 - tmp2;' % (destination.size * 8),
                 '    cpu.flags.cf = tmp1 < tmp2;',
@@ -208,8 +228,12 @@ def cg_sbb(instruction, function_bounds, function_names, destination, operand):
                                                             destination.size * 8,
                                                             arguments.sign_extend(instruction, operand, destination.size))]
     else:
+        if destination.type == x86.X86_OP_MEM:
+            tmp = '    auto tmp1 = %s;' % (arguments.get_value(instruction, destination))
+        else:
+            tmp = '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination))
         return ['{',
-                '    x86::reg%d& tmp1 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination)),
+                tmp,
                 '    x86::reg%d tmp2 = x86::reg%d(%s) + cpu.flags.cf;' % (destination.size * 8, destination.size * 8, arguments.sign_extend(instruction, operand, destination.size)),
                 '    x86::reg%d result = tmp1 - tmp2;' % (destination.size * 8),
                 '    cpu.flags.cf = tmp1 < tmp2;',
@@ -225,9 +249,13 @@ def cg_neg(instruction, function_bounds, function_names, destination):
     if not instruction.precious_flags:
         return ['%s = ~%s + 1;' % (arguments.get_value(instruction, destination), arguments.get_value(instruction, destination))]
     else:
+        if destination.type == x86.X86_OP_MEM:
+            tmp = '    auto tmp2 = %s;' % (arguments.get_value(instruction, destination))
+        else:
+            tmp = '    x86::reg%d& tmp2 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination))
         return ['{',
                 '    x86::reg%d tmp1 = 0;' % (destination.size * 8),
-                '    x86::reg%d& tmp2 = %s;' % (destination.size * 8, arguments.get_value(instruction, destination)),
+                tmp,
                 '    x86::reg%d result = tmp1 - tmp2;' % (destination.size * 8),
                 '    cpu.flags.cf = tmp1 < tmp2;',
                 '    cpu.flags.of = 1 & (tmp1 >> %d);' % (destination.size * 8 - 1),

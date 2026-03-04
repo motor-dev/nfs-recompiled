@@ -20,7 +20,7 @@ HRESULT DirectDrawCreate(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(s_init);
     NFS2_ASSERT(pUnkOuter == nullptr);
     *lplpDD = com::ComAlloc(app);
-    new (app->getMemory<IDirectDraw2>(*lplpDD)) IDirectDraw2();
+    new (&app->getMemory<IDirectDraw2>(*lplpDD)) IDirectDraw2();
     return 0;
 }
 
@@ -28,11 +28,11 @@ HRESULT DirectDrawEnumerateA(WinApplication* app, x86::CPU& cpu,
                              x86::reg32 lpCallback, x86::reg32 lpCallbackParam)
 {
     cpu.esp -= 20;
-    *app->getMemory<x86::reg32>(cpu.esp + 0) = lpCallback;
-    *app->getMemory<x86::reg32>(cpu.esp + 4) = 0;
-    *app->getMemory<x86::reg32>(cpu.esp + 8) = 0;
-    *app->getMemory<x86::reg32>(cpu.esp + 12) = 0;
-    *app->getMemory<x86::reg32>(cpu.esp + 16) = lpCallbackParam;
+    app->getMemory<x86::reg32>(cpu.esp + 0) = lpCallback;
+    app->getMemory<x86::reg32>(cpu.esp + 4) = 0;
+    app->getMemory<x86::reg32>(cpu.esp + 8) = 0;
+    app->getMemory<x86::reg32>(cpu.esp + 12) = 0;
+    app->getMemory<x86::reg32>(cpu.esp + 16) = lpCallbackParam;
     app->dynamic_call(lpCallback, cpu);
     return 0;
 }

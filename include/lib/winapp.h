@@ -57,6 +57,84 @@ private:
     x86::reg32  m_ptr;
 };
 
+template< typename T >
+struct MemoryAccessor
+{
+    friend class WinApplication;
+private:
+    MemoryAccessor(x86::reg8* address) : address(address) {}
+    x86::reg8* address;
+
+public:
+    MemoryAccessor& operator=(const MemoryAccessor& other)
+    {
+        if (this != &other)
+        {
+            T value = other;
+            memcpy(address, &value, sizeof(T));
+        }
+        return *this;
+    }
+    operator T() const { T result; memcpy(&result, address, sizeof(T)); return result; }
+    MemoryAccessor& operator=(T value) { memcpy(address, &value, sizeof(T)); return *this; }
+    T operator-=(T value) { T result = *this; result -= value; memcpy(address, &result, sizeof(T)); return result; }
+    T operator+=(T value) { T result = *this; result += value; memcpy(address, &result, sizeof(T)); return result; }
+    T operator|=(T value) { T result = *this; result |= value; memcpy(address, &result, sizeof(T)); return result; }
+    T operator&=(T value) { T result = *this; result &= value; memcpy(address, &result, sizeof(T)); return result; }
+    T operator^=(T value) { T result = *this; result ^= value; memcpy(address, &result, sizeof(T)); return result; }
+    T operator>>=(T value) { T result = *this; result >>= value; memcpy(address, &result, sizeof(T)); return result; }
+    T operator<<=(T value) { T result = *this; result <<= value; memcpy(address, &result, sizeof(T)); return result; }
+    T operator++(int) { T result = *this; T newValue = result; newValue++; memcpy(address, &newValue, sizeof(T)); return result; }
+    T operator--(int) { T result = *this; T newValue = result; newValue--; memcpy(address, &newValue, sizeof(T)); return result; }
+    T operator++() { T result = *this; T newValue = result; newValue++; memcpy(address, &newValue, sizeof(T)); return newValue; }
+    T operator--() { T result = *this; T newValue = result; newValue--; memcpy(address, &newValue, sizeof(T)); return newValue; }
+    T* operator&() { return reinterpret_cast<T*>(address); }
+};
+
+template<>
+struct MemoryAccessor<x86::IEEEf80>
+{
+    friend class WinApplication;
+private:
+    MemoryAccessor(x86::reg8* address) : address(address) {}
+    x86::reg8* address;
+
+public:
+    MemoryAccessor& operator=(const MemoryAccessor& other) = delete;
+    operator float() const { x86::IEEEf80Data result; memcpy(&result, address, sizeof(x86::IEEEf80Data)); return float(x86::IEEEf80(result)); }
+    operator double() const { x86::IEEEf80Data result; memcpy(&result, address, sizeof(x86::IEEEf80Data)); return double(x86::IEEEf80(result)); }
+    operator x86::IEEEf80() const { x86::IEEEf80Data result; memcpy(&result, address, sizeof(x86::IEEEf80Data)); return x86::IEEEf80(result); }
+    MemoryAccessor& operator=(float value) { x86::IEEEf80 f80value(value); memcpy(address, &f80value.data, sizeof(x86::IEEEf80Data)); return *this; }
+    MemoryAccessor& operator=(double value) { x86::IEEEf80 f80value(value); memcpy(address, &f80value.data, sizeof(x86::IEEEf80Data)); return *this; }
+    MemoryAccessor& operator=(x86::IEEEf80 value) { memcpy(address, &value.data, sizeof(x86::IEEEf80Data)); return *this; }
+};
+
+template<>
+struct MemoryAccessor<void>
+{
+    friend class WinApplication;
+private:
+    MemoryAccessor(x86::reg8* address) : address(address) {}
+    x86::reg8* address;
+
+public:
+    MemoryAccessor& operator=(const MemoryAccessor& other) = delete;
+    void* operator&() { return reinterpret_cast<void*>(address); }
+};
+
+template<>
+struct MemoryAccessor<const void>
+{
+    friend class WinApplication;
+private:
+    MemoryAccessor(x86::reg8* address) : address(address) {}
+    x86::reg8* address;
+
+public:
+    MemoryAccessor& operator=(const MemoryAccessor& other) = delete;
+    const void* operator&() { return reinterpret_cast<const void*>(address); }
+};
+
 class WinApplication
 {
 public:
@@ -66,12 +144,12 @@ public:
     x86::reg32 getAppName() const { return m_appName->getBlockStart(); }
     x86::reg32 getAppNameW() const { return m_appNameW->getBlockStart(); }
     x86::reg32 getEnv() const { return m_env->getBlockStart(); }
-    char* getAppNameRaw() { return getMemory<char>(m_appName->getBlockStart()); }
+    char* getAppNameRaw() { return &getMemory<char>(m_appName->getBlockStart()); }
 
     void addRegistryKey(x86::reg32 root, const char* keyname, const char* valuename, RegistryValue* value);
 
     template< typename T >
-    inline T* getMemory(x86::reg32 address) { return reinterpret_cast<T*>(m_memory + address); }
+    inline MemoryAccessor<T> getMemory(x86::reg32 address) { return MemoryAccessor<T>{m_memory + address}; }
 
     void registerMethod(x86::reg32 pointer, Method method);
 

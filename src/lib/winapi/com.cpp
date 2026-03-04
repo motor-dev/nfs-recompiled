@@ -19,14 +19,14 @@ static x86::reg32 s_firstFreeBlock = 0;
 x86::reg32 ComAlloc(WinApplication* app)
 {
     x86::reg32 result = s_firstFreeBlock;
-    x86::reg32* memory = app->getMemory<x86::reg32>(result);
+    x86::reg32* memory = &app->getMemory<x86::reg32>(result);
     s_firstFreeBlock = *memory;
     return result;
 }
 
 x86::reg32 ComGetIndex(WinApplication* app, const IUnknown* pointer)
 {
-    x86::reg32 offset = x86::reg32(reinterpret_cast<const x86::reg8*>(pointer) - app->getMemory<x86::reg8>(s_memory->getBlockStart()));
+    x86::reg32 offset = x86::reg32(reinterpret_cast<const x86::reg8*>(pointer) - &app->getMemory<const x86::reg8>(s_memory->getBlockStart()));
     return offset + s_memory->getBlockStart();
 }
 
@@ -34,7 +34,7 @@ void ComFree(WinApplication* app, IUnknown* pointer)
 {
     x86::reg32* memory = reinterpret_cast<x86::reg32*>(pointer);
     *memory = s_firstFreeBlock;
-    x86::reg32 block = x86::reg32(reinterpret_cast<x86::reg8*>(memory) - app->getMemory<x86::reg8>(s_memory->getBlockStart()));
+    x86::reg32 block = x86::reg32(reinterpret_cast<x86::reg8*>(memory) - &app->getMemory<const x86::reg8>(s_memory->getBlockStart()));
     s_firstFreeBlock = s_memory->getBlockStart() + block;
 }
 
@@ -42,8 +42,8 @@ bool InitialiseComMemory(WinApplication* app)
 {
     s_memory = new win32::MemMap(1024*1024*1);
     x86::reg32  blockOffset = 0;
-    x86::reg8* blockStart = app->getMemory<x86::reg8>(s_memory->getBlockStart());
-    x86::reg8* blockEnd = app->getMemory<x86::reg8>(s_memory->getBlockStart() + s_memory->getBlockSize()-1);
+    x86::reg8* blockStart = &app->getMemory<x86::reg8>(s_memory->getBlockStart());
+    x86::reg8* blockEnd = &app->getMemory<x86::reg8>(s_memory->getBlockStart() + s_memory->getBlockSize()-1);
     blockOffset += IUnknown::init(app, s_memory->getBlockStart() + blockOffset, blockStart + blockOffset);
     blockOffset += ddraw::IDirectDraw2::init(app, s_memory->getBlockStart() + blockOffset, blockStart + blockOffset);
     blockOffset += ddraw::IDirectDrawPalette::init(app, s_memory->getBlockStart() + blockOffset, blockStart + blockOffset);

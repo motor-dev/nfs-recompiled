@@ -20,7 +20,7 @@ def get_value(instruction, operand):
         else:
             if operand.mem.scale != 1:
                 print('%#x' % instruction.address, instruction.mnemonic, instruction.op_str)
-        return '*app->getMemory<x86::reg%s>(%s)' % (operand.size*8, ' + '.join(offsets))
+        return 'app->getMemory<x86::reg%s>(%s)' % (operand.size*8, ' + '.join(offsets))
     else:
         assert False, operand.type
 
@@ -44,7 +44,7 @@ def get_mmx_value(instruction, operand):
         else:
             if operand.mem.scale != 1:
                 print('%#x' % instruction.address, instruction.mnemonic, instruction.op_str)
-        return 'x86::from_reg64(*app->getMemory<x86::reg64>(%s))' % (' + '.join(offsets))
+        return 'x86::from_reg64(app->getMemory<x86::reg64>(%s))' % (' + '.join(offsets))
     else:
         assert False, operand.type
 
@@ -74,11 +74,11 @@ def get_float(instruction, operand):
             if operand.mem.scale != 1:
                 print('%#x' % instruction.address, instruction.mnemonic, instruction.op_str)
         if operand.size == 4:
-            return '*app->getMemory<float>(%s)' % (' + '.join(offsets))
+            return 'app->getMemory<float>(%s)' % (' + '.join(offsets))
         elif operand.size == 8:
-            return '*app->getMemory<double>(%s)' % (' + '.join(offsets))
+            return 'app->getMemory<double>(%s)' % (' + '.join(offsets))
         elif operand.size == 10:
-            return '*app->getMemory<x86::IEEEf80>(%s)' % (' + '.join(offsets))
+            return 'app->getMemory<x86::IEEEf80>(%s)' % (' + '.join(offsets))
         else:
             assert False, operand.size
     else:
@@ -142,12 +142,12 @@ def get_goto_address(instruction, function_bounds, function_names, operand):
         for dest in instruction.potential_destinations:
             if dest < function_bounds[0] or dest > function_bounds[1]:
                 print('error! switch/case with at least one jump out of reach; function 0x%x/0x%x, jump to 0x%x' % (function_bounds[0], function_bounds[1], dest))
-                return 'return app->dynamic_call(*app->getMemory<x86::reg32>(%s), cpu);' % (' + '.join(offsets))
+                return 'return app->dynamic_call(app->getMemory<x86::reg32>(%s), cpu);' % (' + '.join(offsets))
         else:
             if instruction.potential_destinations:
-                return 'cpu.ip = *app->getMemory<x86::reg32>(%s); goto dynamic_jump;' % (' + '.join(offsets))
+                return 'cpu.ip = app->getMemory<x86::reg32>(%s); goto dynamic_jump;' % (' + '.join(offsets))
             else:
-                return 'return app->dynamic_call(*app->getMemory<x86::reg32>(%s), cpu);' % (' + '.join(offsets))
+                return 'return app->dynamic_call(app->getMemory<x86::reg32>(%s), cpu);' % (' + '.join(offsets))
     else:
         assert False, operand.type
 

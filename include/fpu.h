@@ -14,14 +14,20 @@ namespace x86
     struct Float;
 #endif
 
+    struct IEEEf80Data
+    {
+        x86::reg16  data1;
+        x86::reg16  data2;
+        x86::reg16  data3;
+        x86::reg16  data4;
+        x86::reg16  data5;
+    };
     struct IEEEf80
     {
-        x86::sreg16 data1;
-        x86::sreg16 data2;
-        x86::sreg16 data3;
-        x86::sreg16 data4;
-        x86::sreg16 data5;
+        IEEEf80Data data;
+
         inline IEEEf80();
+        inline IEEEf80(IEEEf80Data data) : data(data) {};
 #ifndef WITH_PEDANTIC_FPU
         inline IEEEf80(double value);
 #else
@@ -31,56 +37,56 @@ namespace x86
         inline void operator=(double value);
     };
 
-    extern "C" void convert80x64(const IEEEf80 *fp80, double *fp64);
-    extern "C" void convert80x32(const IEEEf80 *fp80, float *fp32);
-    extern "C" void convert64x80(const double *fp64, IEEEf80 *fp80);
-    extern "C" void convert32x80(const float *fp32, IEEEf80 *fp80);
-    extern "C" void converti16x80(const sreg16 *int16, IEEEf80 *fp80);
-    extern "C" void converti32x80(const sreg32 *int32, IEEEf80 *fp80);
-    extern "C" void converti64x80(const sreg64 *int64, IEEEf80 *fp80);
-    extern "C" void convert80xi16(const IEEEf80 *fp80, sreg16 *int16);
-    extern "C" void convert80xi32(const IEEEf80 *fp80, sreg32 *int32);
-    extern "C" void convert80xi64(const IEEEf80 *fp80, sreg64 *int64);
-    extern "C" x86::reg32 add80(IEEEf80 *result, const IEEEf80 *operand);
-    extern "C" x86::reg32 sub80(IEEEf80 *result, const IEEEf80 *operand);
-    extern "C" x86::reg32 mul80(IEEEf80 *result, const IEEEf80 *operand);
-    extern "C" x86::reg32 div80(IEEEf80 *result, const IEEEf80 *operand);
-    extern "C" x86::reg32 cmp80(const IEEEf80 *f1, const IEEEf80 *f2);
-    extern "C" x86::reg32 chs80(IEEEf80 *result);
-    extern "C" x86::reg32 sin80(IEEEf80 *result);
-    extern "C" x86::reg32 cos80(IEEEf80 *result);
-    extern "C" x86::reg32 sqrt80(IEEEf80 *result);
-    extern "C" x86::reg32 tan80(IEEEf80 *result);
-    extern "C" x86::reg32 log280(IEEEf80 *result);
-    extern "C" x86::reg32 atan80(IEEEf80 *result, const IEEEf80 *operand);
-    extern "C" x86::reg32 abs80(IEEEf80 *result);
-    extern "C" x86::reg32 round80(IEEEf80 *result, x86::reg32 mode);
-    extern "C" x86::reg32 f2xm180(IEEEf80 *result);
-    extern "C" x86::reg32 scale80(IEEEf80 *result, const IEEEf80 *operand);
-    extern "C" x86::reg32 rem80(IEEEf80 *result, const IEEEf80 *operand);
+    extern "C" void convert80x64(const IEEEf80Data *fp80, double *fp64);
+    extern "C" void convert80x32(const IEEEf80Data *fp80, float *fp32);
+    extern "C" void convert64x80(const double *fp64, IEEEf80Data *fp80);
+    extern "C" void convert32x80(const float *fp32, IEEEf80Data *fp80);
+    extern "C" void converti16x80(const sreg16 *int16, IEEEf80Data *fp80);
+    extern "C" void converti32x80(const sreg32 *int32, IEEEf80Data *fp80);
+    extern "C" void converti64x80(const sreg64 *int64, IEEEf80Data *fp80);
+    extern "C" void convert80xi16(const IEEEf80Data *fp80, sreg16 *int16);
+    extern "C" void convert80xi32(const IEEEf80Data *fp80, sreg32 *int32);
+    extern "C" void convert80xi64(const IEEEf80Data *fp80, sreg64 *int64);
+    extern "C" x86::reg32 add80(IEEEf80Data *result, const IEEEf80Data *operand);
+    extern "C" x86::reg32 sub80(IEEEf80Data *result, const IEEEf80Data *operand);
+    extern "C" x86::reg32 mul80(IEEEf80Data *result, const IEEEf80Data *operand);
+    extern "C" x86::reg32 div80(IEEEf80Data *result, const IEEEf80Data *operand);
+    extern "C" x86::reg32 cmp80(const IEEEf80Data *f1, const IEEEf80Data *f2);
+    extern "C" x86::reg32 chs80(IEEEf80Data *result);
+    extern "C" x86::reg32 sin80(IEEEf80Data *result);
+    extern "C" x86::reg32 cos80(IEEEf80Data *result);
+    extern "C" x86::reg32 sqrt80(IEEEf80Data *result);
+    extern "C" x86::reg32 tan80(IEEEf80Data *result);
+    extern "C" x86::reg32 log280(IEEEf80Data *result);
+    extern "C" x86::reg32 atan80(IEEEf80Data *result, const IEEEf80Data *operand);
+    extern "C" x86::reg32 abs80(IEEEf80Data *result);
+    extern "C" x86::reg32 round80(IEEEf80Data *result, x86::reg32 mode);
+    extern "C" x86::reg32 f2xm180(IEEEf80Data *result);
+    extern "C" x86::reg32 scale80(IEEEf80Data *result, const IEEEf80Data *operand);
+    extern "C" x86::reg32 rem80(IEEEf80Data *result, const IEEEf80Data *operand);
 
     inline IEEEf80::IEEEf80()
-        : data1(0), data2(0), data3(0), data4(0), data5(0)
+        : data{0, 0, 0, 0, 0}
     {
     }
 
 #ifndef WITH_PEDANTIC_FPU
     inline IEEEf80::IEEEf80(double value)
     {
-        convert64x80(&value, this);
+        convert64x80(&value, &data);
     }
 #endif
 
     IEEEf80::operator double() const
     {
         double result;
-        convert80x64(this, &result);
+        convert80x64(&data, &result);
         return result;
     }
 
     void IEEEf80::operator=(double value)
     {
-        convert64x80(&value, this);
+        convert64x80(&value, &data);
     }
 
 #ifdef WITH_PEDANTIC_FPU
@@ -109,40 +115,40 @@ namespace x86
         }
         Float(float value)
         {
-            convert32x80(&value, &f80value);
+            convert32x80(&value, &f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
         }
 
         Float(double value)
         {
-            convert64x80(&value, &f80value);
+            convert64x80(&value, &f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
         }
 
         Float(sreg16 value)
         {
-            converti16x80(&value, &f80value);
+            converti16x80(&value, &f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
         }
 
         Float(sreg32 value)
         {
-            converti32x80(&value, &f80value);
+            converti32x80(&value, &f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
         }
         Float(sreg64 value)
         {
-            converti64x80(&value, &f80value);
+            converti64x80(&value, &f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
         }
 
@@ -154,75 +160,75 @@ namespace x86
         operator double() const
         {
             double result;
-            convert80x64(&f80value, &result);
+            convert80x64(&f80value.data, &result);
             return result;
         }
         operator float() const
         {
             float result;
-            convert80x32(&f80value, &result);
+            convert80x32(&f80value.data, &result);
             return result;
         }
         operator sreg16() const
         {
             sreg16 result;
-            convert80xi16(&f80value, &result);
+            convert80xi16(&f80value.data, &result);
             return result;
         }
         operator sreg32() const
         {
             sreg32 result;
-            convert80xi32(&f80value, &result);
+            convert80xi32(&f80value.data, &result);
             return result;
         }
         operator sreg64() const
         {
             sreg64 result;
-            convert80xi64(&f80value, &result);
+            convert80xi64(&f80value.data, &result);
             return result;
         }
 
         Float &operator+=(const Float &other)
         {
-            add80(&f80value, &other.f80value);
+            add80(&f80value.data, &other.f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
             return *this;
         }
 
         Float &operator-=(const Float &other)
         {
-            sub80(&f80value, &other.f80value);
+            sub80(&f80value.data, &other.f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
             return *this;
         }
 
         Float &operator*=(const Float &other)
         {
-            mul80(&f80value, &other.f80value);
+            mul80(&f80value.data, &other.f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
             return *this;
         }
 
         Float &operator/=(const Float &other)
         {
-            div80(&f80value, &other.f80value);
+            div80(&f80value.data, &other.f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&f80value, &dbgValue);
+            convert80x32(&f80value.data, &dbgValue);
 #endif
             return *this;
         }
         Float operator-() const
         {
             Float result = *this;
-            chs80(&result.f80value);
+            chs80(&result.f80value.data);
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
         }
@@ -479,11 +485,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = tan80(&result.f80value);
+            x86::reg32 r = tan80(&result.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -499,7 +505,7 @@ namespace x86
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -515,7 +521,7 @@ namespace x86
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -527,11 +533,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = value;
-            x86::reg32 r = atan80(&result.f80value, &operand.f80value);
+            x86::reg32 r = atan80(&result.f80value.data, &operand.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -543,11 +549,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = val1;
-            x86::reg32 r = rem80(&result.f80value, &val2.f80value);
+            x86::reg32 r = rem80(&result.f80value.data, &val2.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else
@@ -560,11 +566,11 @@ namespace x86
         {
 #ifdef WITH_PEDANTIC_FPU
             Float result = val1;
-            x86::reg32 r = scale80(&result.f80value, &val2.f80value);
+            x86::reg32 r = scale80(&result.f80value.data, &val2.f80value.data);
             status.word &= ~0x4700;
             status.word |= r & 0x4700;
 #ifdef NFS2SE_X87_DEBUG
-            convert80x32(&result.f80value, &result.dbgValue);
+            convert80x32(&result.f80value.data, &result.dbgValue);
 #endif
             return result;
 #else

@@ -8,7 +8,10 @@ namespace x86
 
 void CPU::rdtsc()
 {
-    edx_eax = SDL_GetTicks();
+    // Emulate a 2GHz CPU
+    uint64_t counter = SDL_GetPerformanceCounter();
+    uint64_t freq = SDL_GetPerformanceFrequency();
+    edx_eax = (uint64_t)((double)counter * 2000000000.0 / (double)freq);
 }
 
 void CPU::cpuid()
@@ -40,7 +43,7 @@ void CPU::cpuid()
 
 #ifndef WITH_PEDANTIC_FPU
 
-extern "C" void convert80x64(const x86::IEEEf80 *fp80, double *fp64)
+extern "C" void convert80x64(const x86::IEEEf80Data *fp80, double *fp64)
 {
     /* Read the 10 raw bytes as a little-endian 80-bit extended-precision
      * value.  Layout (bit numbering from LSB):
@@ -110,7 +113,7 @@ extern "C" void convert80x64(const x86::IEEEf80 *fp80, double *fp64)
     memcpy(fp64, &result, sizeof(result));
 }
 
-extern "C" void convert64x80(const double *fp64, x86::IEEEf80 *fp80)
+extern "C" void convert64x80(const double *fp64, x86::IEEEf80Data *fp80)
 {
     uint64_t bits;
     memcpy(&bits, fp64, sizeof(bits));

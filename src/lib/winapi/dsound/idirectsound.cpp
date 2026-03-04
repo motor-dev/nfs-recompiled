@@ -73,19 +73,19 @@ HRESULT IDirectSound::CreateSoundBuffer(WinApplication* app, x86::CPU& cpu,
         if (!s_primaryBuffer)
         {
             s_primaryBuffer = Packed<IDirectSoundBuffer>(com::ComAlloc(app));
-            IDirectSoundBuffer* buffer = app->getMemory<IDirectSoundBuffer>(s_primaryBuffer);
+            IDirectSoundBuffer* buffer = &app->getMemory<IDirectSoundBuffer>(s_primaryBuffer);
             new (buffer) IDirectSoundBuffer(app, cpu, this, lpcDSBufferDesc);
         }
         else
         {
-            app->getMemory<IDirectSoundBuffer>(s_primaryBuffer)->AddRef(app, cpu);
+            (&app->getMemory<IDirectSoundBuffer>(s_primaryBuffer))->AddRef(app, cpu);
         }
         *lplpDirectSoundBuffer = Packed<IDirectSoundBuffer>(s_primaryBuffer);
     }
     else
     {
         *lplpDirectSoundBuffer = Packed<IDirectSoundBuffer>(com::ComAlloc(app));
-        IDirectSoundBuffer* buffer = app->getMemory<IDirectSoundBuffer>(*lplpDirectSoundBuffer);
+        IDirectSoundBuffer* buffer = &app->getMemory<IDirectSoundBuffer>(*lplpDirectSoundBuffer);
         new (buffer) IDirectSoundBuffer(app, cpu, this, lpcDSBufferDesc);
     }
     return 0;

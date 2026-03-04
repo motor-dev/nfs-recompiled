@@ -28,7 +28,7 @@ endif()
 if (MSVC)
     add_compile_options(/W4 /WX)
 else()
-    add_compile_options(-Wall -Wextra -Werror)
+    add_compile_options(-Wall -Wextra -Werror -Wstrict-aliasing=2)
 endif()
 
 # When building for Windows we have a local copy of SDL2 under the

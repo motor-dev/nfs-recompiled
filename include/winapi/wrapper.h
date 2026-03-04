@@ -10,7 +10,7 @@ namespace win32
 template< typename T >
 struct Unpacker
 {
-    static inline T& unpack(WinApplication* app, x86::reg32 address);
+    static inline T unpack(WinApplication* app, x86::reg32 address);
 };
 
 template< typename T, T t >
@@ -131,63 +131,63 @@ struct Wrapper<R (Owner::*)(WinApplication*, x86::CPU&, T...) const, F>
 template< >
 struct Unpacker<x86::reg8>
 {
-    static inline x86::reg8& unpack(WinApplication* app, x86::reg32 address)
+    static inline x86::reg8 unpack(WinApplication* app, x86::reg32 address)
     {
-        return *app->getMemory<x86::reg8>(address);
+        return app->getMemory<x86::reg8>(address);
     }
 };
 
 template< >
 struct Unpacker<x86::reg16>
 {
-    static inline x86::reg16& unpack(WinApplication* app, x86::reg32 address)
+    static inline x86::reg16 unpack(WinApplication* app, x86::reg32 address)
     {
-        return *app->getMemory<x86::reg16>(address);
+        return app->getMemory<x86::reg16>(address);
     }
 };
 
 template< >
 struct Unpacker<x86::reg32>
 {
-    static inline x86::reg32& unpack(WinApplication* app, x86::reg32 address)
+    static inline x86::reg32 unpack(WinApplication* app, x86::reg32 address)
     {
-        return *app->getMemory<x86::reg32>(address);
+        return app->getMemory<x86::reg32>(address);
     }
 };
 
 template< >
 struct Unpacker<x86::sreg8>
 {
-    static inline x86::sreg8& unpack(WinApplication* app, x86::reg32 address)
+    static inline x86::sreg8 unpack(WinApplication* app, x86::reg32 address)
     {
-        return *app->getMemory<x86::sreg8>(address);
+        return app->getMemory<x86::sreg8>(address);
     }
 };
 
 template< >
 struct Unpacker<x86::sreg16>
 {
-    static inline x86::sreg16& unpack(WinApplication* app, x86::reg32 address)
+    static inline x86::sreg16 unpack(WinApplication* app, x86::reg32 address)
     {
-        return *app->getMemory<x86::sreg16>(address);
+        return app->getMemory<x86::sreg16>(address);
     }
 };
 
 template< >
 struct Unpacker<x86::sreg32>
 {
-    static inline x86::sreg32& unpack(WinApplication* app, x86::reg32 address)
+    static inline x86::sreg32 unpack(WinApplication* app, x86::reg32 address)
     {
-        return *app->getMemory<x86::sreg32>(address);
+        return app->getMemory<x86::sreg32>(address);
     }
 };
 
 template< >
 struct Unpacker<float>
 {
-    static inline float& unpack(WinApplication* app, x86::reg32 address)
+    static inline float unpack(WinApplication* app, x86::reg32 address)
     {
-        return *app->getMemory<float>(address);
+        return app->getMemory<float>(address);
     }
 };
 
@@ -196,7 +196,7 @@ struct Unpacker< Packed<T> >
 {
     static inline Packed<T> unpack(WinApplication* app, x86::reg32 address)
     {
-        return Packed<T>(*app->getMemory<x86::reg32>(address));
+        return Packed<T>(app->getMemory<x86::reg32>(address));
     }
 };
 
@@ -205,8 +205,8 @@ struct Unpacker<T*>
 {
     static inline T* unpack(WinApplication* app, x86::reg32 address)
     {
-        x86::reg32 a = *app->getMemory<x86::reg32>(address);
-        return a == 0 ? nullptr : app->getMemory<T>(a);
+        x86::reg32 a = app->getMemory<x86::reg32>(address);
+        return a == 0 ? nullptr : &app->getMemory<T>(a);
     }
 };
 
@@ -215,8 +215,8 @@ struct Unpacker<const T*>
 {
     static inline const T* unpack(WinApplication* app, x86::reg32 address)
     {
-        x86::reg32 a = *app->getMemory<x86::reg32>(address);
-        return a == 0 ? nullptr : app->getMemory<const T>(a);
+        x86::reg32 a = app->getMemory<x86::reg32>(address);
+        return a == 0 ? nullptr : &app->getMemory<const T>(a);
     }
 };
 

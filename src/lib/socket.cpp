@@ -26,7 +26,7 @@ x86::reg32 Socket::bind(x86::reg32 /*network*/, x86::reg64 /*node*/, x86::reg16 
 
 x86::reg32 Socket::netToA(WinApplication* app, x86::reg32 address)
 {
-    char* buffer = app->getMemory<char>(s_netToABuffer->getBlockStart());
+    char* buffer = &app->getMemory<char>(s_netToABuffer->getBlockStart());
     sprintf(buffer, "%d.%d.%d.%d", address & 0xff, (address >> 8) & 0xff, (address >> 16) & 0xff, address >> 24);
     return s_netToABuffer->getBlockStart();
 }

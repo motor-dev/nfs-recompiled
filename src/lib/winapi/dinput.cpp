@@ -15,7 +15,7 @@ HRESULT DirectInputCreateA(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(dwVersion);
     NFS2_ASSERT(punkOuter == nullptr);
     *lplpDirectInput = Packed<IDirectInput2>(com::ComAlloc(app));
-    IDirectInput2* dinput = app->getMemory<IDirectInput2>(*lplpDirectInput);
+    IDirectInput2* dinput = &app->getMemory<IDirectInput2>(*lplpDirectInput);
     new (dinput) IDirectInput2();
     return 0;
 }

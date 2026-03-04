@@ -135,7 +135,7 @@ HRESULT IDirectDraw2::CreatePalette(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(cpu);
     NFS2_ASSERT(pUnkOuter == nullptr);
     *lpDirectDrawPalette = com::ComAlloc(app);
-    new (app->getMemory<IDirectDrawPalette>(*lpDirectDrawPalette)) IDirectDrawPalette(app, dynamic_cast<Renderer*>(m_resource), dwFlags, lpColorTable);
+    new (&app->getMemory<IDirectDrawPalette>(*lpDirectDrawPalette)) IDirectDrawPalette(app, dynamic_cast<Renderer*>(m_resource), dwFlags, lpColorTable);
     return 0;
 }
 
@@ -146,8 +146,8 @@ HRESULT IDirectDraw2::CreateSurface(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(lpSurfaceDesc);
     NFS2_ASSERT(pUnkOuter == nullptr);
     *lpDirectDrawSurface = com::ComAlloc(app);
-    IDirectDrawSurface* mem = app->getMemory<IDirectDrawSurface>(*lpDirectDrawSurface);
-    new (mem) IDirectDrawSurface(app, app->getMemory<DDSURFACEDESC>(g_currentDisplayMode),
+    IDirectDrawSurface* mem = &app->getMemory<IDirectDrawSurface>(*lpDirectDrawSurface);
+    new (mem) IDirectDrawSurface(app, &app->getMemory<DDSURFACEDESC>(g_currentDisplayMode),
                                  dynamic_cast<Renderer*>(m_resource),
                                  0);
     return 0;
@@ -170,24 +170,24 @@ HRESULT IDirectDraw2::EnumDisplayModes(WinApplication* app, x86::CPU& cpu,
         NFS2_ASSERT(lpDDSurfaceDesc->dwSize == sizeof(DDSURFACEDESC));
     }
     cpu.esp -= 12;
-    *app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
-    *app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm16bpp800;
-    *app->getMemory<x86::reg32>(cpu.esp + 8) = context;
+    app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
+    app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm16bpp800;
+    app->getMemory<x86::reg32>(cpu.esp + 8) = context;
     app->dynamic_call(lpEnumModesCallback, cpu);
     cpu.esp -= 12;
-    *app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
-    *app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm8bpp800;
-    *app->getMemory<x86::reg32>(cpu.esp + 8) = context;
+    app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
+    app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm8bpp800;
+    app->getMemory<x86::reg32>(cpu.esp + 8) = context;
     app->dynamic_call(lpEnumModesCallback, cpu);
     cpu.esp -= 12;
-    *app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
-    *app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm16bpp640;
-    *app->getMemory<x86::reg32>(cpu.esp + 8) = context;
+    app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
+    app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm16bpp640;
+    app->getMemory<x86::reg32>(cpu.esp + 8) = context;
     app->dynamic_call(lpEnumModesCallback, cpu);
     cpu.esp -= 12;
-    *app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
-    *app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm8bpp640;
-    *app->getMemory<x86::reg32>(cpu.esp + 8) = context;
+    app->getMemory<x86::reg32>(cpu.esp + 0) = lpEnumModesCallback;
+    app->getMemory<x86::reg32>(cpu.esp + 4) = g_dm8bpp640;
+    app->getMemory<x86::reg32>(cpu.esp + 8) = context;
     app->dynamic_call(lpEnumModesCallback, cpu);
     return 0;
 }
@@ -223,7 +223,7 @@ HRESULT IDirectDraw2::GetDisplayMode(WinApplication* app, x86::CPU& cpu,
                                      DDSURFACEDESC* desc)
 {
     NFS2_USE(cpu);
-    DDSURFACEDESC* currentDisplayMode = app->getMemory<DDSURFACEDESC>(g_currentDisplayMode);
+    DDSURFACEDESC* currentDisplayMode = &app->getMemory<DDSURFACEDESC>(g_currentDisplayMode);
     memcpy(desc, currentDisplayMode, currentDisplayMode->dwSize);
     return 0;
 }

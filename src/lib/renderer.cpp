@@ -126,12 +126,12 @@ void Renderer::update()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     if (m_depth == 16)
     {
-        //MemMap::fillDebugGraph(m_application->getMemory<x86::reg16>(getFrontBuffer()) + m_width*2);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, m_application->getMemory<x86::reg16>(getFrontBuffer()));
+        //MemMap::fillDebugGraph(&m_application->getMemory<x86::reg16>(getFrontBuffer()) + m_width*2);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, &m_application->getMemory<x86::reg16>(getFrontBuffer()));
     }
     else
     {
-        x86::reg8* srcData = m_application->getMemory<x86::reg8>(getFrontBuffer());
+        x86::reg8* srcData = &m_application->getMemory<x86::reg8>(getFrontBuffer());
         x86::reg32* screenData = reinterpret_cast<x86::reg32*>(malloc(m_width * m_height * 4));
         for (x86::reg32 i = 0; i < m_width*m_height; ++i)
         {

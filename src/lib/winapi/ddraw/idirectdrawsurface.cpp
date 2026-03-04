@@ -46,7 +46,7 @@ BOOL IDirectDrawSurface::QueryInterface(WinApplication* app, x86::CPU& cpu,
 
 const void* IDirectDrawSurface::getPointer(WinApplication* winapp) const
 {
-    return winapp->getMemory<const void>(dynamic_cast<Surface*>(m_resource)->lock());
+    return &winapp->getMemory<const void>(dynamic_cast<Surface*>(m_resource)->lock());
 }
 
 HRESULT IDirectDrawSurface::AddAttachedSurface(WinApplication* app, x86::CPU& cpu,
@@ -88,7 +88,7 @@ HRESULT IDirectDrawSurface::Blt(WinApplication* app, x86::CPU& cpu,
     dstDesc.dwSize = sizeof(dstDesc);
     const void* srcData = lpDDSrcSurface->getPointer(app);
     this->Lock(app, cpu, 0, &dstDesc, 0, 0);
-    memcpy(app->getMemory<void>(dstDesc.lpSurface), srcData, dstDesc.dwWidth*dstDesc.dwHeight*dstDesc.ddpfPixelFormat.dwRGBBitCount / 8);
+    memcpy(&app->getMemory<void>(dstDesc.lpSurface), srcData, dstDesc.dwWidth*dstDesc.dwHeight*dstDesc.ddpfPixelFormat.dwRGBBitCount / 8);
     lpDDSrcSurface->Unlock(app, cpu, nullptr);
     this->Unlock(app, cpu, nullptr);
     return 1;
@@ -173,8 +173,8 @@ HRESULT IDirectDrawSurface::GetAttachedSurface(WinApplication* app, x86::CPU& cp
     NFS2_USE(cpu);
     NFS2_USE(lpDDSCaps);
     *lplpDDAttachedSurface = Packed<LPDIRECTDRAWSURFACE2>(com::ComAlloc(app));
-    IDirectDrawSurface* result = app->getMemory<IDirectDrawSurface>(*lplpDDAttachedSurface);
-    new (result) IDirectDrawSurface(app, app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode),
+    IDirectDrawSurface* result = &app->getMemory<IDirectDrawSurface>(*lplpDDAttachedSurface);
+    new (result) IDirectDrawSurface(app, &app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode),
                                     dynamic_cast<Surface*>(m_resource)->getRenderer(), 1);
     return 0;
 }
@@ -265,7 +265,7 @@ HRESULT IDirectDrawSurface::GetPixelFormat(WinApplication* app, x86::CPU& cpu,
                                            LPDDPIXELFORMAT lpDDPixelFormat)
 {
     NFS2_USE(cpu);
-    DDSURFACEDESC* currentDisplayMode = app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode);
+    DDSURFACEDESC* currentDisplayMode = &app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode);
     memcpy(lpDDPixelFormat, &currentDisplayMode->ddpfPixelFormat, sizeof(DDPIXELFORMAT));
     return 0;
 }
@@ -274,7 +274,7 @@ HRESULT IDirectDrawSurface::GetSurfaceDesc(WinApplication* app, x86::CPU& cpu,
                                            LPDDSURFACEDESC lpDDSurfaceDesc)
 {
     NFS2_USE(cpu);
-    DDSURFACEDESC* currentDisplayMode = app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode);
+    DDSURFACEDESC* currentDisplayMode = &app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode);
     memcpy(lpDDSurfaceDesc, currentDisplayMode, currentDisplayMode->dwSize);
     return 0;
 }
@@ -304,7 +304,7 @@ HRESULT IDirectDrawSurface::Lock(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(dwFlags);
     NFS2_ASSERT(lpDestRect == 0);
     NFS2_ASSERT(hEvent == 0);
-    DDSURFACEDESC* screenMode = app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode);
+    DDSURFACEDESC* screenMode = &app->getMemory<DDSURFACEDESC>(IDirectDraw2::g_currentDisplayMode);
     memcpy(lpDDSurfaceDesc, screenMode, lpDDSurfaceDesc->dwSize);
     lpDDSurfaceDesc->lpSurface = Packed<void>(dynamic_cast<Surface*>(m_resource)->lock());
     return 0;

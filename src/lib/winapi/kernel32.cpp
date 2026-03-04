@@ -370,13 +370,15 @@ BOOL GetCommState(WinApplication* app, x86::CPU& cpu,
 x86::reg32 GetCommandLineA(WinApplication* app, x86::CPU& cpu)
 {
     NFS2_USE(cpu);
+    SDL_Log("%s", app->getAppNameRaw());
     return app->getAppName();
 }
 
 x86::reg32 GetCommandLineW(WinApplication* app, x86::CPU& cpu)
 {
+    NFS2_USE(app);
     NFS2_USE(cpu);
-    return app->getAppNameW();
+    return 0;
 }
 
 BOOL GetConsoleMode(WinApplication* app, x86::CPU& cpu,
@@ -417,7 +419,7 @@ DWORD GetCurrentProcessId(WinApplication* app, x86::CPU& cpu)
 DWORD GetCurrentThreadId(WinApplication* app, x86::CPU& cpu)
 {
     NFS2_USE(cpu);
-    return *app->getMemory<x86::reg32>(cpu.efs + 0x4);
+    return app->getMemory<x86::reg32>(cpu.efs + 0x4);
 }
 
 HANDLE GetCurrentThread(WinApplication* app, x86::CPU& cpu)
@@ -525,8 +527,8 @@ DWORD GetFullPathNameA(WinApplication* app, x86::CPU& cpu,
                        LPCSTR lpFileName, DWORD nBufferLength, LPSTR lpBuffer, x86::reg32* lpFilePart)
 {
     NFS2_USE(nBufferLength);
-    x86::reg32 lpBufferAddress = *app->getMemory<x86::reg32>(cpu.esp + 12);
-    NFS2_ASSERT(app->getMemory<char>(lpBufferAddress) == lpBuffer);
+    x86::reg32 lpBufferAddress = app->getMemory<x86::reg32>(cpu.esp + 12);
+    NFS2_ASSERT(&app->getMemory<char>(lpBufferAddress) == lpBuffer);
     strcpy(lpBuffer, "C:\\nfs2se\\");
     *lpFilePart = lpBufferAddress + static_cast<x86::reg32>(strlen(lpBuffer));
     strcat(lpBuffer, lpFileName);
@@ -859,7 +861,7 @@ x86::reg32 MapViewOfFile(WinApplication* app, x86::CPU& cpu,
     app->unlockContext(cpu);
     File* file = dynamic_cast<File*>(app->getResource(hFileMappingObject));
     MemMap* result = new MemMap(dwNumberOfBytesToMap);
-    void* data = app->getMemory<void>(result->getBlockStart());
+    void* data = &app->getMemory<void>(result->getBlockStart());
     file->seek(0, x86::sreg32(dwFileOffsetLow));
     x86::reg32 bytesRead = 0;
     file->read(data, dwNumberOfBytesToMap, &bytesRead);
@@ -1281,7 +1283,7 @@ x86::reg32 VirtualAlloc(WinApplication* app, x86::CPU& cpu,
     NFS2_USE(flProtect);
     NFS2_ASSERT(lpAddress == nullptr);
     MemMap* map = new MemMap(dwSize);
-    void* data = app->getMemory<void>(map->getBlockStart());
+    void* data = &app->getMemory<void>(map->getBlockStart());
     memset(data, 0, dwSize);
     return map->getBlockStart();
 }

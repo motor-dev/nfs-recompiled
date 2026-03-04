@@ -86,7 +86,7 @@ BOOL IDirectSoundBuffer::QueryInterface(WinApplication* app, x86::CPU& cpu,
     else if (*refiid == IID_IDirectSound3DListener)
     {
         *pvvObject = com::ComAlloc(app);
-        new (app->getMemory<void>(*pvvObject)) IDirectSound3DListener(this);
+        new (&app->getMemory<void>(*pvvObject)) IDirectSound3DListener(this);
         return 0;
     }
     else
